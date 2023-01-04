@@ -1,0 +1,239 @@
+%% HOW TO USE THIS TEMPLATE:
+%%
+%% Ensure that you replace "YOUR NAME HERE" with your own name, in the
+%% \studentname command below.  Also ensure that the "answers" option
+%% appears within the square brackets of the \documentclass command,
+%% otherwise latex will suppress your solutions when compiling.
+%%
+%% Type your solution to each problem part within
+%% the \begin{solution} \end{solution} environment immediately
+%% following it.  Use any of the macros or notation from the
+%% header.tex that you need, or use your own (but try to stay
+%% consistent with the notation used in the problem).
+%%
+%% If you have problems compiling this file, you may lack the
+%% header.tex file (available on the course web page), or your system
+%% may lack some LaTeX packages.  The "exam" package (required) is
+%% available at:
+%%
+%% http://mirror.ctan.org/macros/latex/contrib/exam/exam.cls
+%%
+%% Other packages can be found at ctan.org, or you may just comment
+%% them out (only the exam and ams* packages are absolutely required).
+
+% the "answers" option causes the solutions to be printed
+% \documentclass[11pt,addpoints]{exam}
+
+%请使用xelatex编译
+\documentclass[11pt,addpoints,answers]{exam}
+
+% required macros -- get header.tex file from course web page
+\input{header}
+
+% VARIABLES
+
+\newcommand{\hwnum}{4}
+\newcommand{\studentname}{李田所-114514}
+
+% END OF SUPPLIED VARIABLES
+
+\hwheader                       % execute homework commands
+
+\begin{document}
+
+\pagestyle{head}                % put header on every page
+
+% QUESTIONS START HERE.  PROVIDE SOLUTIONS WITHIN THE "solution"
+% ENVIRONMENTS FOLLOWING EACH QUESTION.
+
+\begin{questions}
+    \question (4.5题) Consider the following MAC for messages of length $\ell(n)=2n-2$ using a pseudorandom function $F$: On input a message $m_0\parallel{m_1}$ (with $|m_0|=|m_1|=n-1$) and key $k\in\set{0,1}^n$, algorithm $\algo{Mac}$ outputs $t=F_k(0\parallel{m_0})\parallel{F_k}(1\parallel{m_1})$. Algorithm $\algo{Vrfy}$ is defined in the natural way. Is this MAC secure? Prove your answer.
+
+        \begin{solution}
+            \newline
+            此方案不是安全的 MAC，攻击者可采用如下策略：
+            \begin{enumerate}
+                \item[*] 构造 $m_1=m_a\parallel{m_b}$ 和 $m_2=m_c\parallel{m_d}$，并向 Oracle 询问得到 $t_1=t_a\parallel{t_b}$ 和 $t_2=t_c\parallel{t_d}$，其中 $m_a\neq{m_c}$ 且 $m_b\neq{m_d}$。
+                \item[*] 输出 $m=m_a\parallel{m_d}$ 和 $t=t_a\parallel{t_d}$（也可以输出 $m=m_b\parallel{m_c}$ 和 $t=t_b\parallel{t_c}$，下以 $m=m_a\parallel{m_d}$ 为例）。
+            \end{enumerate}
+            注意到 $t=F_k(0\parallel{m_a})\parallel{F_k}(1\parallel{m_d})$，而：
+            \begin{enumerate}
+                \item[*] $t_a=F_k(0\parallel{m_a})$、$t_b=F_k(1\parallel{m_b})$,
+                \item[*] $t_c=F_k(0\parallel{m_c})$、$t_d=F_k(1\parallel{m_d})$。
+            \end{enumerate}
+            因而，$\algo{Vrfy}_k(m,t)=1$，另一方面，显然 $m_a\parallel{m_d}$ 没有被查询过，即攻击者有不可忽略的概率攻击成功。
+        \end{solution}
+
+    \question (4.6题) Let $F$ be a pseudorandom function. Show that each of the following MACs is insecure, even if used to authenticate fixed-length messages. (In each case $\algo{Gen}$ outputs a uniform $k\in\set{0,1}^n$; we let $\langle{i}\rangle$ denote an $n/2$-bit encoding of the integer $i$.)
+
+        \begin{enumerate}
+            \item[(a)] To authenticate a message $m=m_1,...,m_\ell$, where $m_i\in\set{0,1}^n$, compute $t:=F_k(m_1)\oplus{...}\oplus{F_k}(m_\ell)$.
+            \item[(b)] To authenticate a message $m=m_1,...,m_\ell$, where $m_i\in\set{0,1}^{n/2}$, compute $t:=F_k(\langle{1}\rangle\parallel{m_1})\oplus{...}\oplus{F_k}(\langle\ell\rangle\parallel{m_\ell})$.
+            \item[(c)] To authenticate a message $m=m_1,...,m_\ell$, where $m_i\in\set{0,1}^{n/2}$, choose uniform $r\in\set{0,1}^n$, compute:
+                \begin{center}
+                    $t:=F_k(r)\oplus{F_k}(\langle{1}\rangle\parallel{m_1})\oplus{...}\oplus{F_k}(\langle\ell\rangle\parallel{m_\ell})$
+                \end{center}
+                and let the tag be $\langle{r,t}\rangle$.
+        \end{enumerate}
+
+        \begin{solution}
+            \begin{enumerate}
+                \item[(a)] 攻击者可采用如下策略：选择不相同的 $m_1$ 和 $m_2$，并向 Oracle 询问 $m'=m_1\parallel{m_2}$ 得到 $t'=F_k(m_1)\oplus{F_k}(m_2)$，输出 $m=m_2\parallel{m_1}$ 和 $t=t'$。\\
+                注意到 $F_k(m_1)\oplus{F_k}(m_2)=F_k(m_2)\oplus{F_k}(m_1)$，有 $\algo{Vrfy}_k(m,t)=1$，另一方面，显然 $m_2\parallel{m_1}$ 没有被查询过，即攻击者有不可忽略的概率攻击成功。
+                \item[(b)] 攻击者可采用如下策略：
+                    \begin{enumerate}
+                        \item[*] 构造互不相同的 $m_a, m_b, m_c, m_d$，向 Oracle 询问 $m_1=m_a\parallel{m_b}$ 得到 $t_1=t_a\parallel{t_b}$、询问 $m_2=m_a\parallel{m_c}$ 得到 $t_2=t_a\parallel{t_c}$、询问 $m_3=m_b\parallel{m_c}$ 得到 $t_3=t_b\parallel{t_c}$。
+                        \item[*] 输出 $m=m_b\parallel{m_d}$ 和 $t=t_1\oplus{t_2}\oplus{t_3}$。
+                    \end{enumerate}
+                    注意到 $t=F_k(\langle{1}\rangle\parallel{m_b})\oplus{F_k(\langle{2}\rangle\parallel{m_d})}$，而：
+                    \begin{enumerate}
+                        \item[*] $t_1=F_k(\langle{1}\rangle\parallel{m_a})\oplus{F_k(\langle{2}\rangle\parallel{m_b})}$,
+                        \item[*] $t_2=F_k(\langle{1}\rangle\parallel{m_a})\oplus{F_k(\langle{2}\rangle\parallel{m_c})}$,
+                        \item[*] $t_3=F_k(\langle{1}\rangle\parallel{m_b})\oplus{F_k(\langle{2}\rangle\parallel{m_c})}$。
+                    \end{enumerate}
+                    因而有 $t_1\oplus{t_2}\oplus{t_3}=F_k(\langle{1}\rangle\parallel{m_b})\oplus{F_k(\langle{2}\rangle\parallel{m_d})}$，故 $\algo{Vrfy}_k(m,t)=1$，另一方面，显然 $m_b\parallel{m_d}$ 没有被查询过，即攻击者有不可忽略的概率攻击成功。
+                \item[(c)] 攻击者可采用如下策略：任意选择 $m'$，直接输出 $m=m'$ 和 $t=\langle\langle{1}\rangle\parallel{m'},0^n\rangle$。\\
+                注意到 $t=F_k(r)\oplus{F_k}(\langle{1}\rangle\parallel{m'})=F_k(\langle{1}\rangle\parallel{m'})\oplus{F_k}(\langle{1}\rangle\parallel{m'})=0^n$，有 $\algo{Vrfy}_k(m,t)=1$，另一方面，显然 $m'$ 没有被查询过，即攻击者有不可忽略的概率攻击成功。
+            \end{enumerate}
+        \end{solution}
+
+    \question (4.7题) Let $F$ be a pseudorandom function. Show that the following MACsfor messages of length $2n$ is insecure: $\algo{Gen}$ outputs a uniform $k\in\set{0,1}^n$. To authenticate a message $m_1\parallel{m_2}$ with $|m_1|=|m_2|=n$, compute the tag $F_k(m_1)\parallel{F_k}(F_k(m_2))$.
+
+        \begin{solution}
+            \newline
+            攻击者可采用如下策略：
+            \begin{enumerate}
+                \item 构造 $m_1=m_a\parallel{m_b}$ 和 $m_2=m_c\parallel{m_d}$，并向 Oracle 询问得到 $t_1=t_a\parallel{t_b}$ 和 $t_2=t_c\parallel{t_d}$，其中 $m_a\neq{m_c}$ 且 $m_b\neq{m_d}$。
+                \item 输出 $m=m_a\parallel{m_d}$ 和 $t=t_a\parallel{t_d}$（也可以输出 $m=m_b\parallel{m_c}$ 和 $t=t_b\parallel{t_c}$，下以 $m=m_a\parallel{m_d}$ 为例）。
+            \end{enumerate}
+            注意到 $t=F_k(m_a)\parallel{F_k}(F_k(m_d))$，而：
+            \begin{enumerate}
+                \item[*] $t_a=F_k(m_a)$、$t_b=F_k(F_k(m_b))$,
+                \item[*] $t_c=F_k(m_c)$、$t_d=F_k(F_k(m_d))$。
+            \end{enumerate}
+            因而，$\algo{Vrfy}_k(m,t)=1$，另一方面，显然 $m_a\parallel{m_d}$ 没有被查询过，即攻击者有不可忽略的概率攻击成功。
+        \end{solution}
+
+    \question (4.8题) Given any $deterministic$ MAC$(\algo{Mac},\algo{Vrfy})$, we may view $\algo{Mac}$ as a keyed function. In both Constructions 4.5 and 4.9, $\algo{Mac}$ is a pseudorandom function. Give a construction of a secure, deterministic MAC in which Mac is $not$ a pseudorandom function.
+
+        \begin{solution}
+            \newline
+            对于伪随机函数 $F$，构造如下方案：
+            \begin{enumerate}
+                \item[\algo{Mac}:] 对于输入的 $k\in\set{0,1}^n$ 和消息 $m\in\set{0,1}^n$，输出认证码 $t:=1\parallel{F_k}(m)$。
+                \item[\algo{Vrfy}:] 对于输入的 $k\in\set{0,1}^n$ 和消息 $m\in\set{0,1}^n$、认证码 $t\in\set{0,1}^{n+1}$，当且仅当 $t=1\parallel{F_k}(m)$ 时输出 $1$。
+            \end{enumerate}
+            上述做法确定性和正确性显然，且对于随机选取的 $t$，$t$ 以 $1$ 开始的概率为 $\frac{1}{2}$，而对于按照上述 MAC 方案产生的 $t$，$t$ 以 $1$ 开始的概率为 $1$，因而上述 MAC 方案不是伪随机函数。
+        \end{solution}
+
+    \question (4.13题) We explore what happens when the basic CBC-MAC construction is used with messages of different lengths.
+
+        \begin{enumerate}
+            \item[(a)] Say the sender and receiver do not agree on the message length in advance (and so $\algo{Vrfy_k}(m,t)=1$ iff $t\overset{?}{=}\algo{Mac_k}(m)$, regardless of the length of $m$), but the sender is careful to only authenticate messages of length $2n$. Show that an adversary can forge a valid tag on a message of length $4n$.
+            \item[(b)] Say the receiver only accepts 3-block messages (so $\algo{Vrfy_k}(m,t)=1$ only if $m$ has length $3n$ and $t\overset{?}{=}\algo{Mac_k}(m)$), but the sender authenticates messages of any length a multiple of $n$. Show that an adversary can forge a valid tag on a new message.
+        \end{enumerate}
+
+        \begin{solution}
+            \begin{enumerate}
+                \item[(a)] 攻击者可采用如下策略：
+                \begin{enumerate}
+                    \item[*] 构造 $m'=m_1\parallel{m_2}$ 并向 Oracle 询问得到 $t'=F_k(F_k(m_1)\oplus{m_2})$。
+                    \item[*] 输出 $m=m_1\parallel{m_2}\parallel{t'\oplus{m_1}}\parallel{m_2}$ 和 $t=t'$。
+                \end{enumerate}
+                注意到对于攻击者构造的 $m$，有：
+                \begin{equation}
+                    \begin{aligned}
+                        t=&F_k(F_k(F_k(F_k(m_1)\oplus{m_2})\oplus{(t'\oplus{m_1})})\oplus{m_2})\\
+                        =&F_k(F_k(F_k(F_k(m_1)\oplus{m_2})\oplus{(F_k(F_k(m_1)\oplus{m_2})\oplus{m_1})})\oplus{m_2})\\
+                        =&F_k(F_k(m_1)\oplus{m_2})
+                    \end{aligned}
+                \end{equation}
+                因而 $\algo{Vrfy}_k(m,t)=1$，另一方面，显然 $m=m_1\parallel{m_2}\parallel{t\oplus{m_1}}\parallel{m_2}$ 没有被查询过，即攻击者有不可忽略的概率攻击成功。
+                \item[(b)] 攻击者可采用如下策略：
+                \begin{enumerate}
+                    \item[*] 随机选择 $m_1$ 并向 Oracle 询问 $m_1$ 得到 $t_1$。
+                    \item[*] 随机选择 $m_2$ 并向 Oracle 询问 $m_2\oplus{t_1}$ 得到 $t_2$。
+                    \item[*] 随机选择 $m_3$ 并向 Oracle 询问 $m_3\oplus{t_2}$ 得到 $t_3$。
+                    \item[*] 输出 $m=m_1\parallel{m_2}\parallel{m_3}$ 和 $t=t_3$。
+                \end{enumerate}
+                注意到对于攻击者构造的 $m$，有：
+                \begin{equation}
+                    \begin{aligned}
+                        t=&F_k(F_k(F_k(m_1)\oplus{m_2})\oplus{m_3})\\
+                        =&F_k(F_k(t_1\oplus{m_2})\oplus{m_3})\\
+                        =&F_k(t_2\oplus{m_3})=t_3
+                    \end{aligned}
+                \end{equation}
+                因而 $\algo{Vrfy}_k(m,t)=1$，另一方面，显然 $m=m_1\parallel{m_2}\parallel{m_3}$ 没有被查询过，即攻击者有不可忽略的概率攻击成功。
+            \end{enumerate}
+        \end{solution}
+
+    \question (4.14题) Prove that the following modifications of basic CBC-MAC do not yield a secure MAC (even for fixed-length messages):
+
+        \begin{enumerate}
+            \item[(a)] Mac outputs all blocks $t_1,\dots,t_\ell$, rather than just $t_\ell$. (Verification only checks whether $t_\ell$ is correct.)
+            \item[(b)] A random initial block is used each time a message is authenticated. That is, change Construction 4.9 by choosing uniform $t_0\in\{0,1\}^n$, computing $t_\ell$ as before, and then outputting the tag $\langle{t_0,t_\ell}\rangle$; verification is done in the natural way.
+        \end{enumerate}
+
+        \begin{solution}
+            \begin{enumerate}
+                \item[(a)] 攻击者可采用如下策略：构造 $m'=m_1\parallel{m_2}$ 并向 Oracle 询问得到 $t_1'=F_k(m_1)$ 和 $t_2'=F_k(F_k(m_1)\oplus{m_2})$，输出 $m=m_2\oplus{t_1'}\parallel{m_1}\oplus{t_2'}$ 和 $t_1=t_2'$、$t_2=t_1'$。\\
+                注意到对于攻击者构造的 $m$，有：
+                \begin{equation}
+                    \begin{aligned}
+                        t_1=&F_k(m_2\oplus{t_1'})=F_k(m_2\oplus{F_k(m_1)})\\
+                        t_2=&F_k(t_2'\oplus{m_1}\oplus{F_k(m_2\oplus{t_1'})})\\
+                        =&F_k(F_k(F_k(m_1)\oplus{m_2})\oplus{m_1}\oplus{F_k(m_2\oplus{F_k(m_1)})})=F_k(m_1)
+                    \end{aligned}
+                \end{equation}
+                因而 $\algo{Vrfy}_k(m,t)=1$，另一方面，显然 $m=m_2\oplus{t_1'}\parallel{m_1}\oplus{t_2'}$ 被查询过的概率（$m_1=m_2\oplus{t_1'}$ 和 $m_2=m_1\oplus{t_2'}$ ）可忽略，即攻击者有不可忽略的概率攻击成功。
+                \item[(b)] 攻击者可采用如下策略：随机选择 $m'$ 并向 Oracle 询问得到 $\langle{t_0,t_1}\rangle$，再直接输出 $m=t_0$ 和 $t=\langle{m',t_1}\rangle$。\\
+                注意到对于攻击者构造的 $m$，有 $t_1=F_k(m'\oplus{t_0})$，因而 $\algo{Vrfy}_k(m,t)=1$，另一方面，显然 $m=t_0$ 被查询过的概率（$m=t_0=m'$，$m$ 和 $t_0$ 为随机选择）可忽略，即攻击者有不可忽略的概率攻击成功。
+            \end{enumerate}
+        \end{solution}
+
+    \question (4.15题)[选做] Show that appending the message length to the end of the message before applying basic CBC-MAC does not result in a secure MAC for arbitrary-length messages.
+
+        \begin{solution}
+            \newline
+            攻击者可采用如下策略：
+            \begin{enumerate}
+                \item[*] 任选等长但不同的 $m_1$ 和 $m_2$，并向 Oracle 询问得到 $t_1=F_k(F_k(m_1)\oplus\langle{|m_1|}\rangle)$ 和 $t_2=F_k(F_k(m_2)\oplus\langle{|m_2|}\rangle)$，构造 $m'=m_1\parallel\langle{|m_1|}\rangle\parallel{t_1}$，再向 Oracle 询问得到 $t'=F_k(F_k(F_k(F_k(m_1)\oplus\langle{|m_1|}\rangle)\oplus{t_1})\oplus\langle{|m'|}\rangle)$。
+                \item[*] 输出 $m=m_2\parallel\langle{|m_2|}\rangle\parallel{t_2}$ 和 $t=F_k(F_k(F_k(F_k(m_2)\oplus\langle{|m_2|}\rangle)\oplus{t_2})\oplus\langle{|m|}\rangle)$。
+            \end{enumerate}
+            注意到 $m$ 和 $m'$ 等长且以下等式成立：
+            \begin{enumerate}
+                \item[*] $t'=F_k(F_k(F_k(F_k(m_1)\oplus\langle{|m_1|}\rangle)\oplus{t_1})\oplus\langle{|m'|}\rangle)=F_k(F_k(t_1\oplus{t_1})\oplus\langle{|m'|}\rangle)$,
+                \item[*] $t=F_k(F_k(F_k(F_k(m_2)\oplus\langle{|m_2|}\rangle)\oplus{t_2})\oplus\langle{|m|}\rangle)=F_k(F_k(t_2\oplus{t_2})\oplus\langle{|m|}\rangle)$。
+            \end{enumerate}
+            因而，$\algo{Vrfy}_k(m,t)=1$，另一方面，显然 $m=m_2\parallel\langle{|m_2|}\rangle\parallel{t_2}$ 没有被查询过，即攻击者有不可忽略的概率攻击成功。
+        \end{solution}
+
+    \question (4.16题)[选做] Define a version of CBC-MAC for messages of length at most $\ell\cdot{2^n}$ as follows: given a message $m$, pad it with $0$s so that it has length exactly $\ell\cdot{2^n}$; apply basic CBC-MAC to the result. Is this secure?
+
+        \begin{solution}
+            \newline
+            此方案不是安全的 MAC，攻击者可采用如下策略：构造 $m'=1$（一位二进制），并向 Oracle 询问得到 $t'=\algo{Mac_k}(1\parallel{0^{\ell\cdot2^n-1}})$，输出 $m=10$（两位二进制）和 $t=t'$。\\
+            注意到 $t=\algo{Mac_k}(10\parallel{0^{\ell\cdot2^n-2}})=\algo{Mac_k}(1\parallel{0^{\ell\cdot2^n-1}})$，因而，$\algo{Vrfy}_k(m,t)=1$，另一方面，显然 $m=10$ 没有被查询过，即攻击者有不可忽略的概率攻击成功。
+        \end{solution}
+
+    \question (4.18题)[选做] Prove that the encoding for arbitrary-length messages described in Section 4.4.2 is prefix-free.
+
+        \begin{solution}
+            \newline
+            对于不同的消息 $m_1$ 和 $m_2$ 考虑以下情况：
+            \begin{enumerate}
+                \item[*] $m_1$ 和 $m_2$ 的长度不同，注意到被填充的消息结构为 $\langle|m|\rangle\parallel0^t\parallel{m}$，两者的 $\langle|m|\rangle$ 部分将出现不同，因而填充结果也不同。
+                \item[*] $m_1$ 和 $m_2$ 的长度相同，注意到被填充的消息结构为 $\langle|m|\rangle\parallel0^t\parallel{m}$，两者的 $\langle|m|\rangle$ 部分一致，而填充结果长度为 $n$ 的倍数，因而两者的 $0^t$ 部分也一致，由于 $m_1$ 和 $m_2$ 是不同的消息，两者的 $m$ 部分将出现不同，因而填充结果也不同。
+            \end{enumerate}
+            由上可知，不同的 $m_1$ 和 $m_2$ 填充的结果互不相同，即按照 4.4.2 中的方式对任意长度的消息进行填充是前缀自由的。
+        \end{solution}
+
+\end{questions}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
