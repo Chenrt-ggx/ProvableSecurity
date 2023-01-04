@@ -1,0 +1,365 @@
+%% HOW TO USE THIS TEMPLATE:
+%%
+%% Ensure that you replace "YOUR NAME HERE" with your own name, in the
+%% \studentname command below.  Also ensure that the "answers" option
+%% appears within the square brackets of the \documentclass command,
+%% otherwise latex will suppress your solutions when compiling.
+%%
+%% Type your solution to each problem part within
+%% the \begin{solution} \end{solution} environment immediately
+%% following it.  Use any of the macros or notation from the
+%% header.tex that you need, or use your own (but try to stay
+%% consistent with the notation used in the problem).
+%%
+%% If you have problems compiling this file, you may lack the
+%% header.tex file (available on the course web page), or your system
+%% may lack some LaTeX packages.  The "exam" package (required) is
+%% available at:
+%%
+%% http://mirror.ctan.org/macros/latex/contrib/exam/exam.cls
+%%
+%% Other packages can be found at ctan.org, or you may just comment
+%% them out (only the exam and ams* packages are absolutely required).
+
+% the "answers" option causes the solutions to be printed
+% \documentclass[11pt,addpoints]{exam}
+
+%请使用xelatex编译
+\documentclass[11pt,addpoints,answers]{exam}
+
+% required macros -- get header.tex file from course web page
+\input{header}
+
+% VARIABLES
+
+\newcommand{\hwnum}{1}
+\newcommand{\studentname}{李田所-114514}
+
+% END OF SUPPLIED VARIABLES
+
+\hwheader                       % execute homework commands
+
+\begin{document}
+
+\pagestyle{head}                % put header on every page
+
+% QUESTIONS START HERE.  PROVIDE SOLUTIONS WITHIN THE "solution"
+% ENVIRONMENTS FOLLOWING EACH QUESTION.
+
+\begin{questions}
+    \question (P36页, 2.3题) Prove or refute: An encryption scheme with message space $\msgspace$ is perfectly secret if and only if for every probability distribution over $\msgspace$ and every $c_0,c_1\in\ctspace$ we have $\Pr[C=c_0]=\Pr[C=c_1]$.
+
+        \begin{solution}
+            \newline
+            不成立，对于 $\msgspace$ 上的任意分布和任意 $c_0,c_1\in\ctspace$，都有 $\Pr[C=c_0]=\Pr[C=c_1]$ 强于完善保密；下面构造一个满足完善保密，但不满足对于 $\msgspace$ 上的任意分布和任意 $c_0,c_1\in\ctspace$，都有 $\Pr[C=c_0]=\Pr[C=c_1]$ 的例子。\\
+            对于一个完善保密的方案 $(\skcgen,\skcenc,\skcdec)$，按如下方式构造另一个方案 $(\skcgen,\skcenc^{'},\skcdec^{'})$（$a[-1]$ 表示 $a$ 的末位，$a[:-1]$ 表示 $a$ 删除末位后的结果）：
+            \begin{equation}
+                \begin{aligned}
+                    & \skcenc_k^{'}(m)=\skcenc_k(m) \parallel b,b\ \text{is randomly selected from}\ \set{0,1,1}\\
+                    & \skcdec_k^{'}(c)=\skcdec_k(c[:-1])
+                \end{aligned}
+            \end{equation}
+            由于方案 $(\skcgen,\skcenc,\skcdec)$ 是完善保密的，显然 $(\skcgen,\skcenc',\skcdec')$ 也是完善保密的。\\
+            注意到 $b$ 有 $\frac{1}{3}$的概率为 $0$，有 $\frac{2}{3}$ 的概率为 $1$，选择 $c_0,c_1\in\ctspace$，其中 $c_i[-1]=i$，显然有 $\Pr[C=c_0]=\neq\Pr[C=c_1]$。
+        \end{solution}
+
+    \question (P37页, 2.4题) Prove or refute: For every perfectly secret encryption scheme it holds that for every distribution on the message space $\msgspace$, every $m,m^{'}\in\msgspace$, and every $c\in\ctspace$:
+
+        \begin{center} $\Pr[M=m|C=c]=\Pr[M=m^{'}|C=c]$ \end{center}
+
+        \begin{solution}
+            \newline
+            不成立，对于 $\msgspace$ 上的任意分布和任意 $m,m^{'}\in\msgspace$，$c\in\ctspace$，都有 $\Pr[M=m|C=c]=\Pr[M=m^{'}|C=c]$ 强于完善保密。\\
+            考虑一个完善保密的方案 $(\skcgen,\skcenc,\skcdec)$，成立：
+            \begin{equation}
+                \begin{aligned}
+                    & \Pr[M=m|C=c]=\Pr[M=m]\\
+                    & \Pr[M=m^{'}|C=c]=\Pr[M=m^{'}]
+                \end{aligned}
+            \end{equation}
+            注意到对于 $\msgspace$ 上的任意非均匀分布和任意 $m,m^{'}\in\msgspace$，$\Pr[M=m]=\Pr[M=m^{'}]$ 不总是成立，因而 $\Pr[M=m|C=c]=\Pr[M=m^{'}|C=c]$ 不总是成立。
+        \end{solution}
+
+    \question (P37页, 2.6题) Prove Lemma 2.7.
+
+        \begin{solution}
+            \newline
+            \begin{large}
+                \textbf{从完善保密推导完美不可区分}
+            \end{large}
+            \newline
+            考虑一个完善保密，对于 $\msgspace$ 上的任意分布和任意 $m_0,m_1\in\msgspace$，$c\in\ctspace$，成立：
+            \begin{equation}
+                \begin{aligned}
+                    \Pr[\skcenc_k(m_0)=c]=\Pr[\skcenc_k(m_1)=c]
+                \end{aligned}
+            \end{equation}
+            记会使攻击者 $\Adv$ 认为 $b^{'}=0$（被加密的消息是 $m_0$）的 $c\in\ctspace_0$，会使攻击者 $\Adv$ 认为 $b^{'}=1$（被加密的消息是 $m_1$）的 $c\in\ctspace_1$，$\ctspace=\ctspace_0\cup\ctspace_1$，则：
+            \begin{equation}
+                \begin{aligned}
+                    \Pr[\algo{PrivK}^{eav}_{\Adv,\Pi}=1]=&\Pr[b=0\wedge{b}^{'}=0]+\Pr[b=1\wedge{b}^{'}=1]\\
+                    =&\frac{1}{2}\Pr[{b}^{'}=0|b=0]+\frac{1}{2}\Pr[{b}^{'}=1|b=1]\\
+                    =&\frac{1}{2}\sum_{c\in\ctspace_0}\Pr[\skcenc_k(m_0)=c]+\frac{1}{2}\sum_{c\in\ctspace_1}\Pr[\skcenc_k(m_1)=c]\\
+                    =&\frac{1}{2}\sum_{c\in\ctspace}\Pr[\skcenc_k(m_0)=c]=\frac{1}{2}\sum_{c\in\ctspace}\Pr[\skcenc_k(m_1)=c]=\frac{1}{2}
+                \end{aligned}
+            \end{equation}
+            \newline
+            \begin{large}
+                \textbf{从完美不可区分推导完善保密}
+            \end{large}
+            \newline
+            使用反证法进行证明，考虑一个不满足完善保密的方案，存在 $\msgspace$ 上的一个分布和 $m_0,m_1\in\msgspace$，$c^{'}\in\ctspace$，成立：
+            \begin{equation}
+                \begin{aligned}
+                    \Pr[\skcenc_k(m_0)=c^{'}]\neq\Pr[\skcenc_k(m_1)=c^{'}]
+                \end{aligned}
+            \end{equation}
+            构造攻击者 $\Adv$，若其收到的密文 $c\neq{c^{'}}$，则随机选择 $b^{'}$ 为 $0$ 或 $1$，否则选择 $b^{'}=0$，则：
+            \begin{equation}
+                \begin{aligned}
+                    \Pr[\algo{PrivK}^{eav}_{\Adv,\Pi}=1]=&\Pr[b=0\wedge{b}^{'}=0]+\Pr[b=1\wedge{b}^{'}=1]\\
+                    =&\frac{1}{2}\Pr[{b}^{'}=0|b=0]+\frac{1}{2}\Pr[{b}^{'}=1|b=1]\\
+                    =&\frac{1}{2}(\Pr[{b}^{'}=0\wedge\skcenc_k(m_0)={c^{'}}]+\Pr[{b}^{'}=0\wedge\skcenc_k(m_0)\neq{c^{'}}])\\
+                    &+\frac{1}{2}(\Pr[{b}^{'}=1\wedge\skcenc_k(m_1)={c^{'}}]+\Pr[{b}^{'}=1\wedge\skcenc_k(m_1)\neq{c^{'}}])\\
+                    =&\frac{1}{2}(\Pr[\skcenc_k(m_0)=c^{'}]+\frac{1}{2}\Pr[\skcenc_k(m_0)\neq{c^{'}}])\\
+                    &+\frac{1}{2}(\frac{1}{2}\Pr[\skcenc_k(m_1)\neq{c^{'}}])\\
+                    =&\frac{1}{2}(\Pr[\skcenc_k(m_0)=c^{'}]+\frac{1}{2}(1-\Pr[\skcenc_k(m_0)=c^{'}]))\\
+                    &+\frac{1}{2}(\frac{1}{2}\Pr[\skcenc_k(m_1)\neq{c^{'}}])\\
+                    =&\frac{1}{4}(1+\Pr[\skcenc_k(m_0)=c^{'}]+\Pr[\skcenc_k(m_1)\neq{c^{'}}])\\
+                    \neq&\frac{1}{4}(1+\Pr[\skcenc_k(m_0)=c^{'}]+\Pr[\skcenc_k(m_0)\neq{c^{'}}])=\frac{2}{4}=\frac{1}{2}
+                \end{aligned}
+            \end{equation}
+            由此可知，上述方案不可完美区分，因此一个完美不可区分的方案一定完善保密。
+        \end{solution}
+
+    \question (P37页, 2.8题) For each of the following encryption schemes, state whether the scheme is perfectly secret. Justify your answer in each case.
+        \begin{parts}
+            \part The message space is $\msgspace=\setfit{0,...,4}$. Algorithm $\skcgen$ chooses a uniform key from the key space $\setfit{0,...,5}$. $\skcenc_k(m)$ returns $\absfit{k+m\bmod{5}}$, and $\skcdec_k(c)$ returns $\absfit{c-k\bmod{5}}$.
+
+            \begin{solution}
+                \newline
+                这不是一个完善保密方案，考虑$C=0$的情况：
+                \begin{equation}
+                    \begin{aligned}
+                        & \Pr[C=0|M=0]=\Pr[K=0]+\Pr[K=5]=\frac{1}{3}\\
+                        & \Pr[C=0|M=1]=\Pr[K=4]=\frac{1}{6}
+                    \end{aligned}
+                \end{equation}
+                因此 $\Pr[C=c|M=m]=\Pr[C=c|M=m^{'}]$ 对任意 $\msgspace$ 的上的分布，任意$m,m^{'}\in\msgspace$ 和任意 $c\in\ctspace$ 不总是成立，上述方案不是一个完善保密方案。
+            \end{solution}
+
+            \part The message space is $\msgspace=\setfit{m\in\set{0,1}^\ell|\text{the last bit of m is 0}}$. $\skcgen$ chooses a uniform key from $\set{0,1}^{\ell-1}$. $\skcenc_k(m)$ returns cipher-text $m\oplus(k\parallel{0})$, and $\skcdec_k(c)$ returns $c\oplus(k\parallel{0})$.
+
+            \begin{solution}
+                \newline
+                这是一个完善保密方案，证明如下（$a[:-1]$ 表示 $a$ 删除末位后的结果）：
+                \begin{equation}
+                    \begin{aligned}
+                        \Pr[M=m|C=c]=&\Pr[C=c|M=m]\cdot\Pr[M=m]/\Pr[C=c]\\
+                        =&Pr[K=(m\oplus{c})[:-1]]\cdot\Pr[M=m]/2^{-(\ell-1)}\\
+                        =&2^{-(\ell-1)}\cdot\Pr[M=m]/2^{-(\ell-1)}\\
+                        =&\Pr[M=m]
+                    \end{aligned}
+                \end{equation}
+                因此对任意 $\msgspace$ 的上的分布，任意$m\in\msgspace$ 和任意 $c\in\ctspace$ 且 $\Pr[C=c]>0$，总成立 $\Pr[M=m|C=c]=\Pr[M=m]$，上述方案是一个完善保密方案。
+            \end{solution}
+
+        \end{parts}
+
+    \question (P37页, 2.10题) The following questions concern the message space $\msgspace=\{0,1\}^{\le\ell}$, the set of all nonempty binary strings of length at most $\ell$.
+        \begin{parts}
+            \part Consider the encryption scheme in which $\skcgen$ chooses a uniform key from $\keyspace=\{0,1\}^{\le\ell}$, and $\skcenc_k(m)$ outputs $k_{|m|}\oplus{m}$, where $k_t$ denotes the first $t$ bits of $k$. Show that this scheme is not perfectly secret for message space $\msgspace$.
+
+            \begin{solution}
+                \newline
+                上述加密方案的问题在于，密文泄露了明文的长度，可构造如下反例说明此方案不是完善保密：
+                \begin{enumerate}
+                    \item[*] 选取一长度为 $l$ 的明文 $m\in\msgspace$。
+                    \item[*] 选取一长度为 $l-1$ 的密文 $c\in\ctspace$。
+                \end{enumerate}
+                注意到上述方案下明文长度始终等于密文长度，可得：
+                \begin{equation}
+                    \begin{aligned}
+                        \Pr[M=m|C=c]=0\neq\Pr[M=m]
+                    \end{aligned}
+                \end{equation}
+                因此对任意 $\msgspace$ 的上的分布，任意$m\in\msgspace$ 和任意 $c\in\ctspace$ 且 $\Pr[C=c]>0$，$\Pr[M=m|C=c]=\Pr[M=m]$ 不总是成立，上述方案不是一个完善保密方案。
+            \end{solution}
+
+            \part Design a perfectly secret encryption scheme for message space $\msgspace$.
+
+            \begin{solution}
+                \newline
+                为了隐藏明文的长度，需要使所有密文长度一致，可按照以下方案对明文进行可逆变换（编码）：
+                \begin{equation}
+                    \begin{aligned}
+                        do\_transform(m)&:\text{将}\ m\ \text{变换为}\ m\ \text{在}\ \msgspace=\{0,1\}^{\le \ell}\ \text{中的排名}\\
+                        undo\_transform(m)&:\text{将}\ m\ \text{变换为在}\ \msgspace=\{0,1\}^{\le \ell}\ \text{中排名}\ m\ \text{的元素}
+                    \end{aligned}
+                \end{equation}
+                注意到 $|\msgspace|=|\{0,1\}^{\le\ell}|=2^{\ell+1}-1$，任意长度不大于 $\ell$ 的明文变换后可得长度为 $\ell+1$ 的结果，只要对变换后的结果应用完善保密方案即可。\\
+                形式化表述如下（记 $(\skcgen,\skcenc,\skcdec)$ 为一个完善保密方案，记 $(\skcgen,\skcenc^{'},\skcdec^{'})$ 为新构造的完善保密方案）：\\
+                \begin{equation}
+                    \begin{aligned}
+                        & \skcenc_k^{'}(m)=\skcenc_k(do\_transform(m))\\
+                        & \skcdec_k^{'}(c)=undo\_transform(\skcdec_k(c))
+                    \end{aligned}
+                \end{equation}
+            \end{solution}
+
+        \end{parts}
+
+    \question (P37页, 2.11题) When using the one-time pad with the key $k=0^\ell$, we have $\skcenc_k(m)=k \oplus{m}=m$ and the message is sent in the clear! It has therefore been suggested to modify the one-time pad by only encrypting with $k\neq{0}^\ell$ (i.e., to have $\skcgen$ choose $k$ uniformly from the set of $nonzero$ keys of length $\ell$). Is this modified scheme still perfectly secret? Explain.
+
+        \begin{solution}
+            \newline
+            这不是一个完善保密方案，因为攻击者可以额外获知密文不是明文，形式化的：
+            \begin{equation}
+                \begin{aligned}
+                    \Pr[M=m|C=m]=0\neq\Pr[M=m]
+                \end{aligned}
+            \end{equation}
+            因此对任意 $\msgspace$ 的上的分布，任意$m\in\msgspace$ 和任意 $c\in\ctspace$ 且 $\Pr[C=c]>0$，$\Pr[M=m|C=c]=\Pr[M=m]$ 不总是成立，上述方案不是一个完善保密方案。
+        \end{solution}
+
+    \question (P38页, 2.15题) Give a direct proof that a scheme satisfying Definition 2.6 must have $|\keyspace|\ge|\msgspace|$. Specifically, let $\Pi$ be an arbitrary encryption scheme with $|\keyspace|<|\msgspace|$. Show an $\Adv$ for which $\Pr[\algo{PrivK}^{eav}_{\Adv,\Pi}=1]>\frac{1}{2}$.
+
+        \par $\text{ }\text{ }\text{ }\text{ }$\textbf{Hint:} It may be easier to let $\Adv$ be randomized.
+
+        \begin{solution}
+            \newline
+            考虑攻击者 $\Adv$：计算是否存在一个 $k\in\keyspace$，满足 $\skcdec_k(c)=m_0$，如果存在则认为 $b^{'}=0$（被加密的消息是 $m_0$），否则 $b^{'}=1$（认为被加密的消息是 $m_1$）。\\
+            注意到 $b=0$ 时，总有 $b^{'}=0$，而 $b=1$ 时至多有 $|\keyspace|$ 个明文可以由 $c$ 解密得到，因此 $\Adv$ 得出 $b^{'}=0$ 的概率为 $\frac{|\keyspace|}{|\msgspace|}<1$，从而：
+            \begin{equation}
+                \begin{aligned}
+                    \Pr[\algo{PrivK}^{eav}_{\Adv,\Pi}=1]=&\Pr[b=0\wedge{b}^{'}=0]+\Pr[b=1\wedge{b}^{'}=1]\\
+                    =&\frac{1}{2}\Pr[{b}^{'}=0|b=0]+\frac{1}{2}\Pr[{b}^{'}=1|b=1]\\
+                    =&\frac{1}{2}+\frac{1}{2}\cdot(1-\Pr[{b}^{'}=0|b=1])\\
+                    =&\frac{1}{2}+\frac{1}{2}\cdot(1-\frac{|\keyspace|}{|\msgspace|})>\frac{1}{2}
+                \end{aligned}
+            \end{equation}
+        \end{solution}
+
+    \question (P39页, 2.18题) Let $\varepsilon>0$ be a constant. Say an encryption scheme is $\varepsilon-perfectly secret$ if for every adversary $\Adv$ it holds that:
+
+    \begin{center} $\Pr[\algo{PrivK}^{eav}_{\Adv,\Pi}=1]\le\frac{1}{2}+\varepsilon$. \end{center}
+
+    (Compare to Definition 2.6.) Consider a variant of the one-time pad where $\msgspace=\{0,1\}^{\ell}$ and the key is chosen uniformly from an arbitrary set $\keyspace\subseteq\{0,1\}^{\ell}$ with $|\keyspace|=(1-\varepsilon)\cdot2^{\ell}$; encryption and decryption are otherwise the same.
+
+        \begin{parts}
+            \part Prove that this scheme is $\varepsilon$-perfectly secret.
+
+            \begin{solution}
+                \newline
+                记 $M_c$ 表示可加密得到 $c$ 的明文的集合，注意到如果攻击者发现 $m_1\notin{M_c}$，就可以确定 $b=0$；如果攻击者发现 $m_0\notin{M_c}$，就可以确定 $b=1$。\\
+                记 $m_0$ 加密可能得到的密文集合为 $c\in\ctspace_0$，$m_1$ 加密可能得到的密文集合为 $c\in\ctspace_1$，下面证明上述方案满足 $\varepsilon$-完善保密：
+                \begin{equation}
+                    \begin{aligned}
+                        \Pr[\algo{PrivK}^{eav}_{\Adv,\Pi}=1]=&\Pr[b=0\wedge{b}^{'}=0]+\Pr[b=1\wedge{b}^{'}=1]\\
+                        =&\frac{1}{2}\Pr[{b}^{'}=0|b=0]+\frac{1}{2}\Pr[{b}^{'}=1|b=1]\\
+                        =&\frac{1}{2}\sum_{c\in{C_0}}\Pr[{b}^{'}=0|C=c]\Pr[C=c]\\
+                        &+\frac{1}{2}\sum_{c\in{C_1}}\Pr[{b}^{'}=1|C=c]\Pr[C=c]\\
+                        =&\frac{1}{2|\keyspace|}(\sum_{c\in{C_0}}\Pr[{b}^{'}=0|C=c]+\sum_{c\in{C_1}}\Pr[{b}^{'}=1|C=c])\\
+                        =&\frac{1}{2|\keyspace|}[\sum_{c\in{C_0}}(\Pr[m_1\notin{M_c}]+\frac{1}{2}\Pr[m_1\in{M_c}])\\
+                        &+\sum_{c\in{C_1}}(\Pr[m_0\notin{M_c}]+\frac{1}{2}\Pr[m_0\in{M_c}])]
+                    \end{aligned}
+                \end{equation}
+                \begin{equation}
+                    \begin{aligned}
+                    \Pr[\algo{PrivK}^{eav}_{\Adv,\Pi}=1]=&\frac{1}{2|\keyspace|}[\sum_{c\in{C_0}}(\Pr[m_1\notin{M_c}]+\frac{1}{2}(1-\Pr[m_1\notin{M_c}]))\\
+                        &+\sum_{c\in{C_1}}(\Pr[m_0\notin{M_c}]+\frac{1}{2}(1-\Pr[m_0\notin{M_c}]))]\\
+                        =&\frac{1}{2|\keyspace|}[\sum_{c\in{C_0}}(\frac{1}{2}\Pr[m_1\notin{M_c}]+\frac{1}{2})+\sum_{c\in{C_1}}(\frac{1}{2}\Pr[m_0\notin{M_c}]+\frac{1}{2})]\\
+                        =&\frac{1}{2}+\frac{1}{4|\keyspace|}(\sum_{c\in{C_0}}\Pr[m_1\notin{M_c}]+\sum_{c\in{C_1}}\Pr[m_0\notin{M_c}])\\
+                        =&\frac{1}{2}+\frac{1}{4|\keyspace|}(\sum_{c\in{C_0}}\frac{|\msgspace|-|M_c|}{|\msgspace|}+\sum_{c\in{C_1}}\frac{|\msgspace|-|M_c|}{|\msgspace|})\\
+                        \leq&\frac{1}{2}+\frac{1}{4|\keyspace|}(\sum_{c\in{C_0}}\varepsilon+\sum_{c\in{C_1}}\varepsilon)\\
+                        =&\frac{1}{2}+\frac{1}{4|\keyspace|}2|\keyspace|\varepsilon=\frac{1}{2}+\frac{\varepsilon}{2}\leq\frac{1}{2}+\varepsilon
+                    \end{aligned}
+                \end{equation}
+            \end{solution}
+
+            \part Prove that this scheme is $(\frac{\varepsilon}{2(1-\varepsilon)})$-perfectly secret when $\varepsilon\le\frac{1}{2}$. (Note that $(\frac{\varepsilon}{2(1-\varepsilon)})<\varepsilon$ here, so this is an improvement over part (a).)
+
+            \begin{solution}
+                \newline
+                第一问中，已经证明给出的方案是 $\frac{\varepsilon}{2}$-完善保密的（不依赖具体的 $\keyspace$ 和 $\msgspace$），而 $\frac{\varepsilon}{2(1-\varepsilon)})>\frac{\varepsilon}{2}$，给出的方案是自然是 $\frac{\varepsilon}{2(1-\varepsilon)}$-完善保密的。
+            \end{solution}
+
+            \part Prove that any deterministic scheme that is $\varepsilon$-perfectly secret must have $|\keyspace|\ge(1-2\varepsilon)\cdot|\msgspace|$. (Note: It is an open question to prove a tight lower bound that also holds for randomized schemes.)
+
+            \begin{solution}
+                \newline
+                第一问中，已经证明给出的方案是 $\frac{\varepsilon}{2}$-完善保密的（不依赖具体的 $\keyspace$ 和 $\msgspace$），将 $|\keyspace|=(1-\varepsilon)\cdot|\msgspace|$ 换成 $|\keyspace|\ge(1-2\varepsilon)\cdot|\msgspace|$，得到的方案自然是 $\varepsilon$-完善保密的。
+            \end{solution}
+
+        \end{parts}
+
+    \question (P39页, 2.19题) In this problem we consider definitions of perfect secrecy for the encryption of two messages (using the same key). Here we consider distributions over pairs of messages from the message space $\msgspace$; we let $M_1,M_2$ be random variables denoting the first and second message, respectively. (We stress that these random variables are not assumed to be independent.) We generate a (single) key $k$, sample a pair of messages $(m_1,m_2)$ according to the given distribution, and then compute cipher texts $c_1\leftarrow\skcenc_k(m_1)$ and $c_2\leftarrow\skcdec_k(m_2)$; this induces a distribution over pairs of cipher texts and we let $C_1$,$C_2$ be the corresponding random variables.
+        \begin{parts}
+            \part Say encryption scheme $(\skcgen,\skcenc,\skcdec)$ is $\textit{perfectly secret for two messages}$ if for all distributions over $\msgspace\times\msgspace$, all $m_1,m_2\in\msgspace$, and all cipher texts $c_1,c_2\in\ctspace$ with $\Pr[C_1=c_1\wedge{C_2}=c_2]>0$:
+            \begin{align*}
+                \Pr[M_1=m_1\wedge{M_2}=&m_2|C_1=c_1\wedge{C_2}=c_2]\\
+                =&\Pr[M_1=m_1\wedge{M_2}=m_2].
+            \end{align*}
+
+            Prove that no encryption scheme can satisfy this definition.
+
+            \par $\text{ }\text{ }\text{ }\text{ }$\textbf{Hint:} Take $c_1=c_2$.
+
+            \begin{solution}
+                \newline
+                注意到 $c_1=c_2$ 时将泄露 $m_1=m_2$ 的信息，任何加密方案都无法满足上述定义，形式化表述如下：
+                \begin{enumerate}
+                    \item[*] 一方面，对任意 $m_1\neq{m_2}$，由于加密方案的正确性 $\Pr[C_1=c\wedge{C_2}=c|M_1=m_1\wedge{M_2}=m_2\wedge{K}=k]=0$，因而对于统一的密钥 $k$，有 $\Pr[C_1=c\wedge{C_2}=c|M_1=m_1\wedge{M_2}=m_2]=0$ 且 $\Pr[C_1=c\wedge{C_2}=c]>0$，从而：
+                    \begin{equation}
+                        \begin{aligned}
+                            & \Pr[M_1=m_1\wedge{M_2}=m_2|C_1=c\wedge{C_2}=c]\\
+                            & \text{ }\text{ }=\frac{\Pr[C_1=c\wedge{C_2}=c|M_1=m_1\wedge{M_2}=m_2]\Pr[M_1=m_1\wedge{M_2}=m_2]}{\Pr[C_1=c\wedge{C_2}=c]}\\
+                            & \text{ }\text{ }=0\cdot\frac{\Pr[M_1=m_1\wedge{M_2}=m_2]}{\Pr[C_1=c\wedge{C_2}=c]}=0
+                        \end{aligned}
+                    \end{equation}
+                    \item[*] 另一方面，显然 $\Pr[M_1=m_1\wedge{M_2}=m_2]\neq0$。
+                \end{enumerate}
+                因此，对于任何加密方案， $\Pr[M_1=m_1\wedge{M_2}=m_2|C_1=c_1\wedge{C_2}=c_2]=\Pr[M_1=m_1\wedge{M_2}=m_2]$ 都不总是成立。
+            \end{solution}
+
+            \part Say encryption scheme $(\skcgen,\skcenc,\skcdec)$ is $\textit{perfectly secret for two distinct messages}$ if for all distributions over $\msgspace\times\msgspace$ where the first and second messages are guaranteed to be different (i.e., distributions over pairs of $\textit{distinct}$ messages), all $m_1,m_2\in\msgspace$, and all cipher texts $c_1,c_2\in\ctspace$ with $\Pr[C_1=c_1\wedge{C_2}=c_2]>0$:
+            \begin{align*}
+                \Pr[M_1=m_1\wedge{M_2}=&m_2|C_1=c_1\wedge{C_2}=c_2]\\
+                =&\Pr[M_1=m_1\wedge{M_2}=m_2].
+            \end{align*}
+
+            Show an encryption scheme that provably satisfies this definition.
+
+            \par $\text{ }\text{ }\text{ }\text{ }$\textbf{Hint:} The encryption scheme you propose need not be efficient, although an efficient solution is possible.
+
+            \begin{solution}
+                \newline
+                构造如下完善保密方案 $(\skcgen,\skcenc,\skcdec)$：
+                \begin{enumerate}
+                    \item[*] $\skcgen$：随机选择一个 $\msgspace$ 上的排列作为 $k$。
+                    \item[*] $\skcenc$：对于密钥（排列） $k$，返回 $k$ 中元素 $m$ 处的下标 $c$ 作为密文。
+                    \item[*] $\skcdec$：对于密钥（排列） $k$，返回 $k$ 中下标 $c$ 处的元素 $m$ 作为明文。
+                \end{enumerate}
+                上述方案的正确性显然，下面证明上述方案满足完善保密的定义，注意到 $\delta_c=\Pr[C_1=c_1\wedge{C_2}=c_2|M_1=m_1\wedge{M_2}=m_2]=\frac{(|\msgspace|-2)!}{|\msgspace|!}$，可得：
+                \begin{equation}
+                    \begin{aligned}
+                        & \Pr[M_1=m_1\wedge{M_2}=m_2|C_1=c_1\wedge{C_2}=c_2]\\
+                        & \text{ }\text{ }=\frac{\Pr[C_1=c_1\wedge{C_2}=c_2|M_1=m_1\wedge{M_2}=m_2]\Pr[M_1=m_1\wedge{M_2}=m_2]}{\Pr[C_1=c_1\wedge{C_2}=c_2]}\\
+                        & \text{ }\text{ }=\frac{\Pr[C_1=c_1\wedge{C_2}=c_2|M_1=m_1\wedge{M_2}=m_2]\Pr[M_1=m_1\wedge{M_2}=m_2]}{\sum_{m_i\neq{m_j}}\Pr[C_1=c_1\wedge{C_2}=c_2|M_1=m_i\wedge{M_2}=m_j]\Pr[M_1=m_i\wedge{M_2}=m_j]}\\
+                        & \text{ }\text{ }=\frac{\delta_c\Pr[M_1=m_1\wedge{M_2}=m_2]}{\sum_{m_i\neq{m_j}}\delta_c\Pr[M_1=m_i\wedge{M_2}=m_j]}\\
+                        & \text{ }\text{ }=\frac{\Pr[M_1=m_1\wedge{M_2}=m_2]}{\sum_{m_i\neq{m_j}}\Pr[M_1=m_i\wedge{M_2}=m_j]}\\
+                        & \text{ }\text{ }=\Pr[M_1=m_1\wedge{M_2}=m_2]
+                    \end{aligned}
+                \end{equation}
+            \end{solution}
+
+        \end{parts}
+
+\end{questions}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

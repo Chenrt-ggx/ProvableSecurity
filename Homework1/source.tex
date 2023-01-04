@@ -1,0 +1,182 @@
+%% HOW TO USE THIS TEMPLATE:
+%%
+%% Ensure that you replace "YOUR NAME HERE" with your own name, in the
+%% \studentname command below.  Also ensure that the "answers" option
+%% appears within the square brackets of the \documentclass command,
+%% otherwise latex will suppress your solutions when compiling.
+%%
+%% Type your solution to each problem part within
+%% the \begin{solution} \end{solution} environment immediately
+%% following it.  Use any of the macros or notation from the
+%% header.tex that you need, or use your own (but try to stay
+%% consistent with the notation used in the problem).
+%%
+%% If you have problems compiling this file, you may lack the
+%% header.tex file (available on the course web page), or your system
+%% may lack some LaTeX packages.  The "exam" package (required) is
+%% available at:
+%%
+%% http://mirror.ctan.org/macros/latex/contrib/exam/exam.cls
+%%
+%% Other packages can be found at ctan.org, or you may just comment
+%% them out (only the exam and ams* packages are absolutely required).
+
+% the "answers" option causes the solutions to be printed
+% \documentclass[11pt,addpoints]{exam}
+
+%请使用xelatex编译
+\documentclass[11pt,addpoints,answers]{exam}
+
+% required macros -- get header.tex file from course web page
+\input{header}
+
+% VARIABLES
+
+\newcommand{\hwnum}{1}
+\newcommand{\studentname}{李田所-114514}
+
+% END OF SUPPLIED VARIABLES
+
+\hwheader                       % execute homework commands
+
+\begin{document}
+
+\pagestyle{head}                % put header on every page
+
+% QUESTIONS START HERE.  PROVIDE SOLUTIONS WITHIN THE "solution"
+% ENVIRONMENTS FOLLOWING EACH QUESTION.
+
+\begin{questions}
+    \question (P36页, 2.3题) Prove or refute: An encryption scheme with message space $\msgspace$ is perfectly secret if and only if for every probability distribution over $\msgspace$ and every $c_0, c_1 \in \ctspace$ we have $\Pr[C=c_0] = \Pr[C=c_1]$.
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+    \question (P37页, 2.4题) Prove or refute: For every perfectly secret encryption scheme it holds that for every distribution on the message space $\msgspace$, every $m,m^{'} \in \msgspace$, and every $c \in \ctspace$:
+
+        \begin{center} $\Pr[M=m|C=c] = \Pr[M=m^{'}|C=c]$ \end{center}
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+    \question (P37页, 2.6题) Prove Lemma 2.7.
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+    \question (P37页, 2.8题) For each of the following encryption schemes, state whether the scheme is perfectly secret. Justify your answer in each case.
+        \begin{parts}
+            \part The message space is $\msgspace=\setfit{0,...,4}$. Algorithm $\skcgen$ chooses a uniform key from the key space $\setfit{0,...,5}$. $\skcenc_k(m)$ returns $\absfit{k+m\bmod{5}}$, and $\skcdec_k(c)$ returns $\absfit{c-k\bmod{5}}$.
+
+            \begin{solution}
+                %在此写入答案
+            \end{solution}
+
+            \part The message space is $\msgspace = \setfit{m \in \set{0,1}^\ell | \text{the last bit of m is 0}}$. $\skcgen$ chooses a uniform key from $\set{0,1}^{\ell-1}$. $\skcenc_k(m)$ returns cipher-text $m \oplus (k \parallel 0)$, and $\skcdec_k(c)$ returns $c \oplus (k \parallel 0)$.
+
+            \begin{solution}
+                %在此写入答案
+            \end{solution}
+
+        \end{parts}
+
+    \question (P37页, 2.10题) The following questions concern the message space $\msgspace=\{0,1\}^{\le \ell}$, the set of all nonempty binary strings of length at most $\ell$.
+        \begin{parts}
+            \part Consider the encryption scheme in which $\skcgen$ chooses a uniform key from $\keyspace=\{0,1\}^{\le \ell}$, and $\skcenc_k(m)$ outputs $k_{|m|} \oplus m$, where $k_t$ denotes the first $t$ bits of $k$. Show that this scheme is not perfectly secret for message space $\msgspace$.
+
+            \begin{solution}
+                %在此写入答案
+            \end{solution}
+
+            \part Design a perfectly secret encryption scheme for message space $\msgspace$.
+
+            \begin{solution}
+                %在此写入答案
+            \end{solution}
+
+        \end{parts}
+
+    \question (P37页, 2.11题) When using the one-time pad with the key $k=0^\ell$, we have $\skcenc_k(m)=k \oplus m = m$ and the message is sent in the clear! It has therefore been suggested to modify the one-time pad by only encrypting with $k \neq 0^\ell$ (i.e., to have $\skcgen$ choose $k$ uniformly from the set of $nonzero$ keys of length $\ell$). Is this modified scheme stll perfectly secret? Explain.
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+    \question (P38页, 2.15题) Give a direct proof that a scheme satisfying Definition 2.6 must have $|\keyspace|\ge |\msgspace|$. Specifically, let $\Pi$ be an arbitrary encryption scheme with $|\keyspace| < |\msgspace|$. Show an $\Adv$ for which $\Pr[\algo{PrivK}^{eav}_{\Adv,\Pi}=1]>\frac{1}{2}$.\\
+
+        \par $\text{ }\text{ }\text{ }\text{ }$\textbf{Hint:} It may be easier to let $\Adv$ be randomized.
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+    \question (P39页, 2.18题) Let $\varepsilon > 0$ be a constant. Say an encryption scheme is $\varepsilon -perfectly secret$ if for every adversary $\AdvA$ it holds that:
+
+    \begin{center} $\Pr[\algo{PrivK}^{eav}_{\Adv,\Pi}=1] \le \frac{1}{2} + \varepsilon $. \end{center}
+
+    (Compare to Definition 2.6.) Consider a variant of the one-time pad where $\msgspace=\{0,1\}^{\ell}$ and the key is chosen uniformly from an arbitrary set $\keyspace \subseteq \{0,1\}^{\ell}$ with $|\keyspace|=(1-\varepsilon ) \cdot 2^{\ell}$; encryption and decryption are otherwise the same.
+
+        \begin{parts}
+            \part Prove that this scheme is $\varepsilon $-perfectly secret.
+
+            \begin{solution}
+                %在此写入答案
+            \end{solution}
+
+            \part Prove that this scheme is $(\frac{\varepsilon }{2(1-\varepsilon )})$-perfectly secret when $\varepsilon  \le \frac{1}{2}$. (Note that $(\frac{\varepsilon }{2(1-\varepsilon )})<\varepsilon $ here, so this is an improvement over part (a).)
+
+            \begin{solution}
+                %在此写入答案
+            \end{solution}
+
+            \part Prove that any deterministic scheme that is $\varepsilon $-perfectly secret must have $|\keyspace| \ge (1-2\varepsilon )\cdot|\msgspace|$. (Note: It is an open question to prove a tight lower bound that also holds for randomized schemes.)
+
+            \begin{solution}
+                %在此写入答案
+            \end{solution}
+
+        \end{parts}
+
+    \question (P39页, 2.19题) In this problem we consider definitions of perfect secrecy for the encryption of two messages (using the same key). Here we consider distributions over pairs of messages from the message space $\msgspace$; we let $M_1, M_2$ be random variables denoting the first and second message, respectively. (We stress that these random variables are not assumed to be independent.) We generate a (single) key $k$, sample a pair of messages $(m_1, m_2)$ according to the given distribution, and then compute ciphertexts $c_1 \leftarrow \skcenc_k(m_1)$ and $c_2 \leftarrow \skcdec_k(m_2)$; this induces a distribution over pairs of ciphertexts and we let $C_1$, $C_2$ be the corresponding random variables.
+        \begin{parts}
+            \part Say encryption scheme $(\skcgen,\skcenc,\skcdec)$ is $\textit{perfectly secret for two messages}$ if for all distributions over $\msgspace \times \msgspace$, all $m_1, m_2 \in \msgspace$, and all ciphertexts $c_1, c_2 \in \ctspace$ with $\Pr[C_1 = c_1 \wedge C_2 = c_2] > 0$:
+            \begin{align*}
+                \Pr [M_1 = m_1 \wedge M_2 =& m_2 | C_1 = c_1 \wedge C_2 = c_2]\\
+                =& \Pr[M_1 = m_1 \wedge M_2 = m_2].
+            \end{align*}
+
+            Prove that no encryption scheme can satisfy this definition.
+
+            \par $\text{ }\text{ }\text{ }\text{ }$\textbf{Hint:} Take $c_1=c_2$.
+
+            \begin{solution}
+                %在此写入答案
+            \end{solution}
+
+            \part Say encryption scheme $(\skcgen,\skcenc,\skcdec)$ is $\textit{perfectly secret for two distinct messages}$ if for all distributions over $\msgspace \times \msgspace$ where the first and second messages are guaranteed to be different (i.e., distributions over pairs of $\textit{distinct}$ messages), all $m_1, m_2 \in \msgspace$, and all ciphertexts $c_1, c_2 \in \ctspace$ with $\Pr[C_1 = c_1 \wedge C_2 = c_2] > 0$:
+            \begin{align*}
+                \Pr [M_1 = m_1 \wedge M_2 =& m_2 | C_1 = c_1 \wedge C_2 = c_2]\\
+                =& \Pr[M_1 = m_1 \wedge M_2 = m_2].
+            \end{align*}
+
+            Show an encryption scheme that provably satisfies this definition.
+
+            \par $\text{ }\text{ }\text{ }\text{ }$\textbf{Hint:} The encryption scheme you propose need not be efficient, although an efficient solution is possible.
+
+            \begin{solution}
+                %在此写入答案
+            \end{solution}
+
+        \end{parts}
+
+\end{questions}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
