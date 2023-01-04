@@ -1,0 +1,447 @@
+%% HOW TO USE THIS TEMPLATE:
+%%
+%% Ensure that you replace "YOUR NAME HERE" with your own name, in the
+%% \studentname command below.  Also ensure that the "answers" option
+%% appears within the square brackets of the \documentclass command,
+%% otherwise latex will suppress your solutions when compiling.
+%%
+%% Type your solution to each problem part within
+%% the \begin{solution} \end{solution} environment immediately
+%% following it.  Use any of the macros or notation from the
+%% header.tex that you need, or use your own (but try to stay
+%% consistent with the notation used in the problem).
+%%
+%% If you have problems compiling this file, you may lack the
+%% header.tex file (available on the course web page), or your system
+%% may lack some LaTeX packages.  The "exam" package (required) is
+%% available at:
+%%
+%% http://mirror.ctan.org/macros/latex/contrib/exam/exam.cls
+%%
+%% Other packages can be found at ctan.org, or you may just comment
+%% them out (only the exam and ams* packages are absolutely required).
+
+% the "answers" option causes the solutions to be printed
+% \documentclass[11pt,addpoints]{exam}
+
+%请使用xelatex编译
+\documentclass[11pt,addpoints,answers]{exam}
+
+% required macros -- get header.tex file from course web page
+\input{header}
+
+% VARIABLES
+
+\newcommand{\hwnum}{3}
+\newcommand{\studentname}{李田所-114514}
+
+% END OF SUPPLIED VARIABLES
+
+\hwheader                       % execute homework commands
+
+\begin{document}
+
+\pagestyle{head}                % put header on every page
+
+% QUESTIONS START HERE.  PROVIDE SOLUTIONS WITHIN THE "solution"
+% ENVIRONMENTS FOLLOWING EACH QUESTION.
+
+\begin{questions}
+    \question (3.9题) Consider a notion of indistinguishable encryption for multiple $distinct$ messages, i.e., where a scheme need not hide whether the same message is encrypted twice.
+
+        \begin{enumerate}
+            \item Modify Definition 3.18 to obtain a suitable definition of the above.
+            \item Show that Construction 3.17 does not satisfy your definition.
+            \item Give a construction of a $deterministic$ (stateless) encryption scheme that satisfies your definition.
+        \end{enumerate}
+
+        \begin{solution}
+            \begin{enumerate}
+                \item 只要调整实验 $\algo{PrivK}^{mult}_{\Adv,\Pi}(n)$ 的第一步，限制 $\vec{M_0}=(m_{0,1},...,m_{0,t})$ 中所有的 $m_{0,i}$ 互不相同，限制 $\vec{M_1}=(m_{1,1},...,m_{1,t})$ 中所有的 $m_{1,i}$ 互不相同（不要求所有的 $m_{0,i}$ 和所有的 $m_{1,i}$ 也互不相同）。
+                \item 只要选择 $\vec{M_0}=(0^n,1\parallel0^{n-1})$ 和 $\vec{M_1}=(0^n,0^{n-1}\parallel1)$，对于结果 $\vec{C}=(c_0,c_1)$，如果 $c_0$ 和 $c_1$ 的最后一位相同，攻击者就可以确定 $b=0$（输出 $b'=0$）；如果 $c_0$ 和 $c_1$ 的最后一位不同，攻击者就可以确定 $b=1$（输出 $b'=1$）。
+                \item 由于无需考虑重复消息的问题，可以采用如下构造（$F$ 为一个伪随机置换）：
+                    \begin{enumerate}
+                        \item[*] $Gen$：对于输入 $1^n$，随机选择 $k\in\set{0,1}^n$，并输出 $k$。
+                        \item[*] $Enc$：对于 $k\in\set{0,1}^n$ 和明文 $m\in\set{0,1}^n$，计算密文 $F_k(m)$ 并输出。
+                        \item[*] $Dec$：对于 $k\in\set{0,1}^n$ 和密文 $c\in\set{0,1}^n$，计算明文 $F_k^{-1}(c)$ 并输出。
+                    \end{enumerate}
+            \end{enumerate}
+        \end{solution}
+
+    \question (3.11题) Let $F$ be a length-preseving pseudorandom function. For the following constructions of a keyed function $F':\{0,1\}^n\times\{0,1\}^{n-1}\rightarrow\{0,1\}^{2n}$, state whether $F'$ is a pseudorandom function. If yes, prove it; if not, show an attack.
+
+        \begin{enumerate}
+            \item $F_k'\overset{def}=F_k(0\parallel{x})\parallel{F_k}(0\parallel{x})$.
+            \item $F_k'\overset{def}=F_k(0\parallel{x})\parallel{F_k}(1\parallel{x})$.
+            \item $F_k'\overset{def}=F_k(0\parallel{x})\parallel{F_k}(x\parallel{0})$.
+            \item $F_k'\overset{def}=F_k(0\parallel{x})\parallel{F_k}(x\parallel{1})$.
+        \end{enumerate}
+
+        \begin{solution}
+            \begin{enumerate}
+                \item $F'$ 不是伪随机函数，考虑 $x=0^{n-1}$，有 $F_k'(x)=F_k(0^n)\parallel{F_k}(0^n)$；注意到对于真随机的函数 $f$，$f(x)$ 的前半部分和后半部分相同的概率可忽略，$D$ 可根据输出的前半部分和后半部分是否相同（相同时输出 $1$）区分 $F_k'$ 和 $f$。
+                \item $F'$ 是伪随机函数。下假设 $F'$ 不是伪随机函数（存在对 $F'$ 的高效识别器 $D'$），下面说明 $F$ 也不是伪随机函数，可按如下方式构造对 $F$ 的高效识别器 $D$：
+                    \begin{enumerate}
+                        \item[*] 启动对 $F'$ 识别器 $D'$。
+                        \item[*] 对于 $D'$ 的每一次询问 $x$，$D$ 分别询问 $0\parallel{x}$ 和 $1\parallel{x}$ 的结果 $f(0\parallel{x})$ 和 $f(1\parallel{x})$，并向 $D'$ 返回 $f(0\parallel{x})\parallel{f}(1\parallel{x})$。
+                        \item[*] 将 $D'$ 的输出作为 $D$ 的输出。
+                    \end{enumerate}
+                    由于 $F$ 是伪随机函数，假设不成立，$F'$ 是伪随机函数。
+                \item $F'$ 不是伪随机函数，考虑 $x=0^{n-1}$，有 $F_k'(x)=F_k(0^n)\parallel{F_k}(0^n)$；注意到对于真随机的函数 $f$，$f(x)$ 的前半部分和后半部分相同的概率可忽略，$D$ 可根据输出的前半部分和后半部分是否相同（相同时输出 $1$）区分 $F_k'$ 和 $f$。
+                \item $F'$ 不是伪随机函数，考虑 $x_1=0^{n-1}$ 和 $x_2=0^{n-2}\parallel1$，有 $F_k'(x_1)=F_k(0^n)\parallel{F_k}(0^{n-1}\parallel1)$ 和 $F_k'(x_2)=F_k(0^{n-1}\parallel1)\parallel{F_k}(0^{n-2}\parallel1^2)$；注意到对于真随机的函数 $f$，$f(x_1)$ 的后半部分和 $f(x_2)$ 的前半部分相同的概率可忽略，$D$ 可根据函数在 $x_1$ 处输出的后半部分和在 $x_2$ 处输出的前半部分是否相同（相同时输出 $1$）区分 $F_k'$ 和 $f$。
+            \end{enumerate}
+        \end{solution}
+
+    \question (3.13题) Let $F$ be a keyed function and consider the following experiment:
+
+        \indent The PRF indistinguishability experiment $PRF_{\AdvA,F}(n)$:
+
+        \begin{enumerate}
+            \item $A$ uniform bit $b\in\{0,1\}$ is chosen. If $b=1$ then choose uniform $k\in\{0,1\}^n$.
+            \item $\AdvA$ is given $1^n$ for input. If $b=0$ then $\AdvA$ is given access to a uniform function $f\in\algo{Func}_n$. If $b=1$ then $\AdvA$ is instead given access to $F_k(\cdot)$.
+            \item $\AdvA$ outputs a bit $b'$.
+            \item The output of the experiment is defined to be $1$ if $b'=b$, and $0$ otherwise.
+        \end{enumerate}
+
+        Define pseudorandom functions using this experiment, and prove that your definition is equivalent to Definition 3.24.
+
+        \begin{solution}
+            \newline
+            伪随机函数 $F$ 可通过上述实验定义为，对于任意多项式时间的算法 $\AdvA$，成立：
+            \begin{equation}
+                \begin{aligned}
+                    \Pr[\algo{PRG}_{\AdvA,F}(n)=1]\leq\frac{1}{2}+negl(n)
+                \end{aligned}
+            \end{equation}
+            等价性证明如下：
+            \begin{equation}
+                \begin{aligned}
+                    \Pr[\algo{PRG}_{\AdvA,F}(n)=1]=&\Pr[b=0\wedge{b}^{'}=0]+\Pr[b=1\wedge{b}^{'}=1]\\
+                    =&\frac{1}{2}Pr[D^{f(\cdot)}(1^n)=0]+\frac{1}{2}Pr[D^{F_k(\cdot)}(1^n)=1]\\
+                    =&\frac{1}{2}\cdot(1-Pr[D^{f(\cdot)}(1^n)=1])+\frac{1}{2}Pr[D^{F_k(\cdot)}(1^n)=1]\\
+                    =&\frac{1}{2}+\frac{1}{2}\cdot(Pr[D^{F_k(\cdot)}(1^n)=1]-Pr[D^{f(\cdot)}(1^n)=1])
+                \end{aligned}
+            \end{equation}
+            从而可得如下等式：
+            \begin{equation}
+                \begin{aligned}
+                    \Pr[\algo{PRG}_{\AdvA,F}(n)=1]-\frac{1}{2}=\frac{1}{2}\cdot(Pr[D^{F_k(\cdot)}(1^n)=1]-Pr[D^{f(\cdot)}(1^n)=1])\\
+                    |\Pr[\algo{PRG}_{\AdvA,F}(n)=1]-\frac{1}{2}|=\frac{1}{2}\cdot|Pr[D^{F_k(\cdot)}(1^n)=1]-Pr[D^{f(\cdot)}(1^n)=1]|
+                \end{aligned}
+            \end{equation}
+            若上述定义成立，则有：
+            \begin{equation}
+                \begin{aligned}
+                    |\Pr[\algo{PRG}_{\AdvA,F}(n)=1]-\frac{1}{2}|=\frac{1}{2}\cdot|Pr[D^{F_k(\cdot)}(1^n)=1]-Pr[D^{f(\cdot)}(1^n)=1]|\leq{negl}(n)
+                \end{aligned}
+            \end{equation}
+            从而可得：
+            \begin{equation}
+                \begin{aligned}
+                    |Pr[D^{F_k(\cdot)}(1^n)=1]-Pr[D^{f(\cdot)}(1^n)=1]|\leq{negl}(n)
+                \end{aligned}
+            \end{equation}
+            若定义 3.24 成立，则有：
+            \begin{equation}
+                \begin{aligned}
+                    |\Pr[\algo{PRG}_{\AdvA,F}(n)=1]-\frac{1}{2}|=\frac{1}{2}\cdot|Pr[D^{F_k(\cdot)}(1^n)=1]-Pr[D^{f(\cdot)}(1^n)=1]|\leq{negl}(n)
+                \end{aligned}
+            \end{equation}
+            从而可得：
+            \begin{equation}
+                \begin{aligned}
+                    \frac{1}{2}-negl(n)\leq\Pr[\algo{PRG}_{\AdvA,F}(n)=1]\leq\frac{1}{2}+negl(n)
+                \end{aligned}
+            \end{equation}
+        \end{solution}
+
+    \question (3.16题) Prove that if $F$ is a length-preserving pseudorandom function, then $G(s)\overset{def}{=}F_s(\left\langle1\right\rangle)\parallel{F_s}(\left\langle2\right\rangle)\parallel\cdots\parallel{F_s}(\left\langle\ell\right\rangle)$, where $\left\langle{i}\right\rangle$ is the $n$-bit encoding of $i$, is a pseudorandom generator with expansion factor $\ell\cdot{n}$.
+
+        \begin{solution}
+            \newline
+            假设 $G$ 不是伪随机生成器（存在对 $G$ 的高效识别器 $D'$），下面说明 $F$ 也不是伪随机函数，可按如下方式构造对 $F$ 的高效识别器 $D$：
+                \begin{enumerate}
+                    \item[*] 分别查询 $f(\left\langle1\right\rangle)$、$f(\left\langle2\right\rangle)$ 到 $f(\left\langle{l}\right\rangle)$。
+                    \item[*] 拼接查询结果，并通过 $D'$ 进行区分：计算 $D'(f(\left\langle1\right\rangle)\parallel{f}(\left\langle2\right\rangle)\parallel...\parallel{f}(\left\langle{l}\right\rangle))$。
+                    \item[*] 将 $D'$ 的输出作为 $D$ 的输出。
+                \end{enumerate}
+                由于 $F$ 是伪随机函数，假设不成立，$G$ 是伪随机生成器。
+        \end{solution}
+
+    \question (3.19题) Let $F$ be a pseudorandom permutation, and define a fixed-length ecryption scheme $(\textsf{Enc},\textsf{Dec})$ as follows: On input a key $k\in\{0,1\}^n$ and message $m\in\{0,1\}^{n/2}$, algorithm $\textsf{Enc}$ chooses a uniform string $r\in\{0,1\}^{n/2}$ and computes $c:=F_k(r\parallel{m})$.
+
+        Show how to decrypt, and prove that this scheme is CPA-secure for messages of length $n/2$.
+
+        \begin{solution}
+            \newline
+            解密方案显然为 $m:=F_k^{-1}(c)[n/2+1:n]$（将 $c$ 进行反置换后取后一半作为明文），下面证明此方案满足 CPA 安全。\\
+            在此方案 $\Pi=(Gen,Enc,Dec)$ 的基础上构造方案 $\widetilde{\Pi}=(\widetilde{Gen},\widetilde{Enc},\widetilde{Dec})$，$\widetilde{\Pi}$ 除将 $\Pi$ 中使用的伪随机置换 $F$ 替换为真随机置换 $f$ 外与 $\Pi$ 保持一致。\\
+            先证明以下等式成立：
+            \begin{equation}
+                \label{equal-1}
+                \begin{aligned}
+                    |\Pr[\algo{PrivK}^{cpa}_{\AdvA,\Pi}(n)=1]-\Pr[\algo{PrivK}^{cpa}_{\AdvA,\widetilde{\Pi}}(n)=1]|\leq{negl}(n)
+                \end{aligned}
+            \end{equation}
+            假设上式不成立即存在攻击者 $\AdvA$ 可以高效区分 $\Pi$ 和 $\widetilde{\Pi}$，可按照如下方式构造可高效区分 $F$ 与 $f$ 的区分器 $D$：
+            \begin{enumerate}
+                \item 启动 $\AdvA(1^n)$，当 $\AdvA$ 向黑箱发出一次查询时，$D$ 随机选取 $r\in\set{0,1}^{n/2}$，查询 $F_k(r\parallel{m})$ 并返回给 $\AdvA$。
+                \item 当 $\AdvA$ 给出消息 $m_0$ 和 $m_1$ 时，随机选择 $b\in\set{0,1}$，$D$ 随机选取 $r\in\set{0,1}^{n/2}$，查询 $F_k(r\parallel{m_b})$ 并返回给 $\AdvA$。
+                \item 按第 1 步持续回答 $\AdvA$ 向黑箱发出查询，直到 $\AdvA$ 输出 $b'$，当 $b'=b$ 时 $D$ 输出 $1$，否则 $D$ 输出 $0$。
+            \end{enumerate}
+            注意到以下两式：
+            \begin{equation}
+                \begin{aligned}
+                   \Pr[\algo{PrivK}^{cpa}_{\AdvA,\Pi}(n)=1]=Pr[D^{F_k(\cdot)}(1^n)=1]
+                \end{aligned}
+            \end{equation}
+            \begin{equation}
+                \begin{aligned}
+                   \Pr[\algo{PrivK}^{cpa}_{\AdvA,\widetilde{\Pi}}(n)=1]=Pr[D^{f(\cdot)}(1^n)=1]
+                \end{aligned}
+            \end{equation}
+            由于 $F$ 为伪随机函数，假设不成立，即不存在攻击者 $\AdvA$ 可以高效区分 $\Pi$ 和 $\widetilde{\Pi}$。设 $\AdvA$ 查询黑箱的次数存在多项式上限 $q(\cdot)$，再证明以下等式成立：
+            \begin{equation}
+                \label{equal-2}
+                \begin{aligned}
+                   \Pr[\algo{PrivK}^{cpa}_{\AdvA,\widetilde{\Pi}}(n)=1]\leq\frac{1}{2}+\frac{q(n)}{2^{n/2}}
+                \end{aligned}
+            \end{equation}
+            考虑以下两种情况：
+            \begin{enumerate}
+                \item[*] $r$ 曾被使用过，此时 $\AdvA$ 可以确定被加密的消息，但由于 $\AdvA$ 被限制在多项式时间，这种情况的发生次数存在上限 $\frac{q(n)}{2^{n/2}}$。
+                \item[*] $r$ 未被使用过，此时 $\AdvA$ 完全无法确定被加密的消息。
+            \end{enumerate}
+            由此可知：
+            \begin{equation}
+                \begin{aligned}
+                   \Pr[\algo{PrivK}^{cpa}_{\AdvA,\widetilde{\Pi}}(n)=1]=&\Pr[\algo{PrivK}^{cpa}_{\AdvA,\widetilde{\Pi}}(n)=1\land{repeat}]+\Pr[\algo{PrivK}^{cpa}_{\AdvA,\widetilde{\Pi}}(n)=1\land\overline{repeat}]\\
+                   &\leq\Pr[repeat]+\Pr[\algo{PrivK}^{cpa}_{\AdvA,\widetilde{\Pi}}(n)=1|\overline{repeat}]\\
+                   &\leq\frac{1}{2}+\frac{q(n)}{2^{n/2}}
+                \end{aligned}
+            \end{equation}
+            由式 [\ref{equal-1}] 和 [\ref{equal-2}] 可知：
+            \begin{equation}
+                \begin{aligned}
+                   \Pr[\algo{PrivK}^{cpa}_{\AdvA,\Pi}(n)=1]\leq\frac{1}{2}+\frac{q(n)}{2^{n/2}}+negl(n)
+                \end{aligned}
+            \end{equation}
+            又因为 $\frac{q(n)}{2^{n/2}}$ 同样可忽略，有：
+            \begin{equation}
+                \begin{aligned}
+                   \Pr[\algo{PrivK}^{cpa}_{\AdvA,\Pi}(n)=1]\leq\frac{1}{2}+negl(n)
+                \end{aligned}
+            \end{equation}
+            即方案 $\Pi=(Gen,Enc,Dec)$ 是 CPA 安全的。
+        \end{solution}
+
+    \question(3.20题) Let $F$ be a length preserving pseudorandom function and $G$ be a pseudorandom generator with expansion factor $\ell(n)=n+1$. For each of the following encryption schemes, state whether the scheme has indistinguishable encryptions in the presence of an eavesdropper and whether it is CPA-secure.(In each case, the shared key is a uniform $k\in\{0,1\}^n$.) Explain your answer.
+
+        \begin{enumerate}
+            \item To encrypt $m\in\{0,1\}^{n+1}$, choose uniform $r\in\{0,1\}^n$ and output the ciphertext $\langle{r,G(r)\oplus{m}}\rangle$.
+            \item To encrypt $m\in\{0,1\}^n$, output the ciphertext $m\oplus{F_k}(0^n)$.
+            \item To encrypt $m\in\{0,1\}^{2n}$, parse $m$ as $\scriptstyle{m_1}\parallel{m_2}$ with $|m_1|=|m_2|$, then choose uniform $r\in\{0,1\}^n$ and send $\langle{r,m_1\oplus{F_k(r)},m_2\oplus{F_k(r+1)}}\rangle$.
+        \end{enumerate}
+
+        \begin{solution}
+            \begin{enumerate}
+                \item 这个方案与其说是加密不如说是编码，由于并没有用到 $k$，攻击者观察到 $\langle{r,c}\rangle$ 后，只要计算 $G(r)\oplus{c}$，即可直接获得明文。因而这个方案不满足 EAV 安全，进而也不满足 CPA 安全。
+                \item 这个方案是 EAV 安全的，只要将 $F_k(0^n)$ 视为伪随机生成器 $G(k)$（假设 $G(k)$ 不是伪随机生成器，可利用对 $G$ 的高效识别器构造对 $F$ 的高效识别器），此时这一方案即为书中的构造 3.17，是 EAV 安全的；另一方面，由于这个方案是确定性的，因而不是 CPA 安全的。
+                \item 这个方案是 CPA 安全的，下面进行证明。在此方案 $\Pi=(Gen,Enc,Dec)$ 的基础上构造方案 $\widetilde{\Pi}=(\widetilde{Gen},\widetilde{Enc},\widetilde{Dec})$，$\widetilde{\Pi}$ 除将 $\Pi$ 中使用的伪随机函数 $F$ 替换为真随机函数 $f$ 外与 $\Pi$ 保持一致。\\
+                先证明以下等式成立：
+                \begin{equation}
+                    \label{equal-3}
+                    \begin{aligned}
+                        |\Pr[\algo{PrivK}^{cpa}_{\AdvA,\Pi}(n)=1]-\Pr[\algo{PrivK}^{cpa}_{\AdvA,\widetilde{\Pi}}(n)=1]|\leq{negl}(n)
+                    \end{aligned}
+                \end{equation}
+                假设上式不成立即存在攻击者 $\AdvA$ 可以高效区分 $\Pi$ 和 $\widetilde{\Pi}$，可按照如下方式构造可高效区分 $F$ 与 $f$ 的区分器 $D$：
+                \begin{enumerate}
+                    \item 启动 $\AdvA(1^{2n})$，当 $\AdvA$ 向黑箱发出一次查询时，$D$ 随机选取 $r\in\set{0,1}^n$，并将 $m$ 分为等长的 $m_1$ 和 $m_2$ 两部分，分别查询 $F_k(r)$ 和 $F_k(r+1)$ 并计算 $\langle{r,m_1\oplus{F_k(r)},m_2\oplus{F_k(r+1)}}\rangle$ 返回给 $\AdvA$。
+                    \item 当 $\AdvA$ 给出消息 $m_0$ 和 $m_1$ 时，随机选择 $b\in\set{0,1}$，$D$ 随机选取 $r\in\set{0,1}^n$，并将 $m_b$ 分为等长的 $m_1$ 和 $m_2$ 两部分，分别查询 $F_k(r)$ 和 $F_k(r+1)$ 并计算 $\langle{r,m_1\oplus{F_k(r)},m_2\oplus{F_k(r+1)}}\rangle$ 返回给 $\AdvA$。
+                    \item 按第 1 步持续回答 $\AdvA$ 向黑箱发出查询，直到 $\AdvA$ 输出 $b'$，当 $b'=b$ 时 $D$ 输出 $1$，否则 $D$ 输出 $0$。
+                \end{enumerate}
+                注意到以下两式：
+                \begin{equation}
+                    \begin{aligned}
+                       \Pr[\algo{PrivK}^{cpa}_{\AdvA,\Pi}(2n)=1]=Pr[D^{F_k(\cdot)}(1^n)=1]
+                    \end{aligned}
+                \end{equation}
+                \begin{equation}
+                    \begin{aligned}
+                       \Pr[\algo{PrivK}^{cpa}_{\AdvA,\widetilde{\Pi}}(2n)=1]=Pr[D^{f(\cdot)}(1^n)=1]
+                    \end{aligned}
+                \end{equation}
+                由于 $F$ 为伪随机函数，假设不成立，即不存在攻击者 $\AdvA$ 可以高效区分 $\Pi$ 和 $\widetilde{\Pi}$。设 $\AdvA$ 查询黑箱的次数存在多项式上限 $q(\cdot)$，再证明以下等式成立：
+                \begin{equation}
+                    \label{equal-4}
+                    \begin{aligned}
+                       \Pr[\algo{PrivK}^{cpa}_{\AdvA,\widetilde{\Pi}}(n)=1]\leq\frac{1}{2}+\frac{q(n)}{2^{n-1}}
+                    \end{aligned}
+                \end{equation}
+                考虑以下两种情况：
+                \begin{enumerate}
+                    \item[*] $r$ 或 $r-1$ 曾被使用过，此时 $\AdvA$ 可以确定被加密的消息（每一次查询黑盒后，$\AdvA$ 可以确定 $F_k(r)$ 和 $F_k(r + 1)$），但由于 $\AdvA$ 被限制在多项式时间，这种情况的发生次数存在上限 $\frac{2q(n)}{2^n}=\frac{q(n)}{2^{n-1}}$。
+                    \item[*] $r$ 和 $r-1$ 未被使用过，此时 $\AdvA$ 完全无法确定被加密的消息。
+                \end{enumerate}
+                由此可知：
+                \begin{equation}
+                    \begin{aligned}
+                       \Pr[\algo{PrivK}^{cpa}_{\AdvA,\widetilde{\Pi}}(n)=1]=&\Pr[\algo{PrivK}^{cpa}_{\AdvA,\widetilde{\Pi}}(n)=1\land{repeat}]+\Pr[\algo{PrivK}^{cpa}_{\AdvA,\widetilde{\Pi}}(n)=1\land\overline{repeat}]\\
+                       &\leq\Pr[repeat]+\Pr[\algo{PrivK}^{cpa}_{\AdvA,\widetilde{\Pi}}(n)=1|\overline{repeat}]\\
+                       &\leq\frac{1}{2}+\frac{q(n)}{2^{n-1}}
+                    \end{aligned}
+                \end{equation}
+                由式 [\ref{equal-3}] 和 [\ref{equal-4}] 可知：
+                \begin{equation}
+                    \begin{aligned}
+                       \Pr[\algo{PrivK}^{cpa}_{\AdvA,\Pi}(n)=1]\leq\frac{1}{2}+\frac{q(n)}{2^{n-1}}+negl(n)
+                    \end{aligned}
+                \end{equation}
+                又因为 $\frac{q(n)}{2^{n-1}}$ 同样可忽略，有：
+                \begin{equation}
+                    \begin{aligned}
+                       \Pr[\algo{PrivK}^{cpa}_{\AdvA,\Pi}(n)=1]\leq\frac{1}{2}+negl(n)
+                    \end{aligned}
+                \end{equation}
+                即方案 $\Pi=(Gen,Enc,Dec)$ 是 CPA 安全的，进而也是 EAV 安全的。
+            \end{enumerate}
+        \end{solution}
+
+    \question (3.25题) Let $F$ be a pseudorandom permutation. Consider the mode of operation in which a uniform value $IV\in\{0,1\}^n$ is chosen, and the $i$th ciphertext block $c_i$ is computed as $c_i:=F_k(IV+i+m_i)$, where addition is modulo $2^n$. Show that this scheme is not EAV-secure.
+
+        \begin{solution}
+            \newline
+            攻击者可取 $m_0=0^{2n}$，$m_1=0^{n-1}\parallel1\parallel0^n$，注意到以下性质：
+            \begin{enumerate}
+                \item[*] $m_0$ 将被拆分成 $0^n$ 和 $0^n$ 两部分进行加密，密文分别为 $F_k(IV+i+0^n)$ 和 $F_k(IV+i+1+0^n)$，由于 $F_k$ 是伪随机函数，两部分密文相等的概率可忽略（否则可由此构造对 $F$ 的高效识别器）。
+                \item[*] $m_1$ 将被拆分成 $0^{n-1}\parallel1$ 和 $0^n$ 两部分进行加密，密文分别为 $F_k(IV+i+0^{n-1}\parallel1)$ 和 $F_k(IV+i+1+0^n)$，注意到$F_k(IV+i+0^{n-1}\parallel1)=F_k(IV+i+0^n+1)$，两部分密文一定相等。
+            \end{enumerate}
+            因此，攻击者可根据两部分密文是否相等（相等时输出 $1$）区分被加密的消息是 $m_0$ 还是 $m_1$，上述方案不是 EAV 安全的。
+        \end{solution}
+
+    \question ([选做]3.28题) For any function $g:\{0,1\}^n\leftarrow\{0,1\}^n$, define $g^\text{\$}(\cdot)$ to be a $probabilistic$ oracle that, on input $1^n$, chooses uniform $r\in\{0,1\}^n$ and returns $\left\langle{r,g(r)}\right\rangle$. A keyed function $F$ is a $weak\ pseudorandom\ function$ if for all PPT algorithms $D$, there exists a negligible function $\textsf{negl}$ such that:
+
+        \begin{center}
+            $\left|\operatorname{Pr}\left[D^{F_k^\$(\cdot)}\left(1^n\right)=1\right]-\operatorname{Pr}\left[D^{f^\$(\cdot)}\left(1^n\right)=1\right]\right|\leq\operatorname{negl}(n)$
+        \end{center}
+
+        where $k\in\{0,1\}^n$ and $f\in\textsf{Func}_n$ are chosen uniformly.
+
+        \begin{enumerate}
+            \item Prove that $F$ is pseudorandom then it is weakly pseudorandom.
+            \item Let $F'$ be a pseudorandom function, and define:
+                \begin{center}
+                    $F_k(x)\stackrel{\text{def}}{=}\left\{\begin{array}{cl}F_k^{\prime}(x)&\text{if}\ x\ \text{is even}\\F_k^{\prime}(x+1)&\text{if}\ x\ \text{is odd}\end{array}\right.$
+                \end{center}
+                Prove that $F$ is weakly pseudorandom, but $not$ pseudorandom.
+            \item Is CTR-mode encryption using a weak pseudorandom function necessarily CPA-secure? Prove your answer.
+            \item Prove that Construction 3.28 is CPA-secure if $F$ is a weak pseudorandom function.
+        \end{enumerate}
+
+        \begin{solution}
+            \begin{enumerate}
+                \item 假设 $F$ 不是弱伪随机函数（存在对 $F$ 的高效识别器 $D'$ 可区分 $F$ 是否为弱伪随机函数），下面说明 $F$ 也不是伪随机函数，可按如下方式构造对 $F$ 的高效识别器 $D$ 以区分 $F$ 是否为伪随机函数：
+                    \begin{enumerate}
+                        \item[*] 启动对 $F'$ 识别器 $D'$。
+                        \item[*] 对于 $D'$ 的每一次询问，$D$ 随机选择 $r\in\{0,1\}^n$ ，并查询 $F_k(r)$，将 $\left\langle{r,F_k(r)}\right\rangle$ 返回给 $D'$。
+                        \item[*] 将 $D'$ 的输出作为 $D$ 的输出。
+                    \end{enumerate}
+                    由于 $F$ 是伪随机函数，假设不成立，$F$ 也是弱伪随机函数。
+                \item $F'$ 不是伪随机函数，考虑 $x_1=0^{n-1}\parallel1$ 和 $x_2=0^{n-2}\parallel10$，有 $F_k(x_1)=F_k'(0^{n-2}\parallel10)$ 和 $F_k(x_2)=F_k'(0^{n-2}\parallel10)$；注意到对于真随机的函数 $f$，$f(x_1)$ 和 $f(x_2)$ 相同的概率可忽略，$D$ 可根据函数在 $x_1$ 处的输出和在 $x_2$ 处的输出是否相同（相同时输出 $1$）区分 $F_k$ 和 $f$。\\
+                另一方面，$F'$ 是弱伪随机函数，这是因为当且仅当选取了奇数 $i$ 和偶数 $i+1$ 时，才可以区分 $F_k$ 和 $f$，而在 $r$ 为黑箱随机选取而不是由 $D$ 指定的情况下，恰好选取了奇数 $i$ 和偶数 $i+1$ 的概率不超过 $\frac{n}{2^n}$，可忽略，进而区分 $F_k$ 和 $f$ 概率同样可忽略。
+                \item 在 CTR 模式下使用弱伪随机函数不满足 CPA 安全。考虑第 2 问中使用的弱伪随机函数 $F_k$，注意到对于奇数 $i$ 和偶数 $i+1$，有 $F_k(i)=F_k(i+1)$，可知第 $i$ 个密文块和第 $i+1$ 个密文块异或的结果等于第 $i$ 个明文块和第 $i+1$ 个明文块异或的结果，攻击者可采取如下策略：
+                \begin{enumerate}
+                    \item[*] 选择 $m_0=0^{3n}$，若 $b=0$，$m_0$ 将被拆分成 $0^n, 0^n, 0^n$ 三部分进行加密，且第二部分与第三部分的明文异或值、第二部分与第三部分的密文异或值均为 $0^n$。
+                    \item[*] 选择 $m_1=0^{2n}\parallel1^n$，若 $b=1$，$m_1$ 将被拆分成 $0^n, 0^n, 1^n$ 三部分进行加密，且第二部分与第三部分的明文异或值、第二部分与第三部分的密文异或值均为 $1^n$。
+                \end{enumerate}
+                攻击者只要观察第二部分与第三部分的密文异或值（若为 $0^n$ 则输出 $0$），即可区分被加密的消息是 $m_0$ 还是 $m_1$，上述方案不是 EAV 安全的，进而也不是 CPA 安全的。
+                \item 在当前方案 $\Pi=(Gen,Enc,Dec)$ 的基础上构造方案 $\widetilde{\Pi}=(\widetilde{Gen},\widetilde{Enc},\widetilde{Dec})$，$\widetilde{\Pi}$ 除将 $\Pi$ 中使用的弱伪随机函数 $F$ 替换为真随机函数 $f$ 外与 $\Pi$ 保持一致。\\
+                先证明以下等式成立：
+                \begin{equation}
+                    \label{equal-5}
+                    \begin{aligned}
+                        |\Pr[\algo{PrivK}^{cpa}_{\AdvA,\Pi}(n)=1]-\Pr[\algo{PrivK}^{cpa}_{\AdvA,\widetilde{\Pi}}(n)=1]|\leq{negl}(n)
+                    \end{aligned}
+                \end{equation}
+                假设上式不成立即存在攻击者 $\AdvA$ 可以高效区分 $\Pi$ 和 $\widetilde{\Pi}$，可按照如下方式构造可高效区分 $F$ 与 $f$ 的区分器 $D$：
+                \begin{enumerate}
+                    \item 启动 $\AdvA(1^n)$，当 $\AdvA$ 向黑箱发出一次查询时，$D$ 进行一次查询得到 $\left\langle{r,F_k(r)}\right\rangle$，并将 $\left\langle{r,F_k(r)\oplus{m}}\right\rangle$ 返回给 $\AdvA$。
+                    \item 当 $\AdvA$ 给出消息 $m_0$ 和 $m_1$ 时，随机选择 $b\in\set{0,1}$，$D$ 进行一次查询得到 $\left\langle{r,F_k(r)}\right\rangle$，并将 $\left\langle{r,F_k(r)\oplus{m_b}}\right\rangle$ 返回给 $\AdvA$。
+                    \item 按第 1 步持续回答 $\AdvA$ 向黑箱发出查询，直到 $\AdvA$ 输出 $b'$，当 $b'=b$ 时 $D$ 输出 $1$，否则 $D$ 输出 $0$。
+                \end{enumerate}
+                注意到以下两式：
+                \begin{equation}
+                    \begin{aligned}
+                       \Pr[\algo{PrivK}^{cpa}_{\AdvA,\Pi}(n)=1]=Pr[D^{F_k^{\$}(\cdot)}(1^n)=1]
+                    \end{aligned}
+                \end{equation}
+                \begin{equation}
+                    \begin{aligned}
+                       \Pr[\algo{PrivK}^{cpa}_{\AdvA,\widetilde{\Pi}}(n)=1]=Pr[D^{f^{\$}(\cdot)}(1^n)=1]
+                    \end{aligned}
+                \end{equation}
+                由于 $F$ 为弱伪随机函数，假设不成立，即不存在攻击者 $\AdvA$ 可以高效区分 $\Pi$ 和 $\widetilde{\Pi}$。设 $\AdvA$ 查询黑箱的次数存在多项式上限 $q(\cdot)$，再证明以下等式成立：
+                \begin{equation}
+                    \label{equal-6}
+                    \begin{aligned}
+                       \Pr[\algo{PrivK}^{cpa}_{\AdvA,\widetilde{\Pi}}(n)=1]\leq\frac{1}{2}+\frac{q(n)}{2^n}
+                    \end{aligned}
+                \end{equation}
+                考虑以下两种情况：
+                \begin{enumerate}
+                    \item[*] $r$ 曾被使用过，此时 $\AdvA$ 可以确定被加密的消息，但由于 $\AdvA$ 被限制在多项式时间，这种情况的发生次数存在上限 $\frac{q(n)}{2^n}$。
+                    \item[*] $r$ 未被使用过，此时 $\AdvA$ 完全无法确定被加密的消息。
+                \end{enumerate}
+                由此可知：
+                \begin{equation}
+                    \begin{aligned}
+                       \Pr[\algo{PrivK}^{cpa}_{\AdvA,\widetilde{\Pi}}(n)=1]=&\Pr[\algo{PrivK}^{cpa}_{\AdvA,\widetilde{\Pi}}(n)=1\land{repeat}]+\Pr[\algo{PrivK}^{cpa}_{\AdvA,\widetilde{\Pi}}(n)=1\land\overline{repeat}]\\
+                       &\leq\Pr[repeat]+\Pr[\algo{PrivK}^{cpa}_{\AdvA,\widetilde{\Pi}}(n)=1|\overline{repeat}]\\
+                       &\leq\frac{1}{2}+\frac{q(n)}{2^n}
+                    \end{aligned}
+                \end{equation}
+                由式 [\ref{equal-5}] 和 [\ref{equal-6}] 可知：
+                \begin{equation}
+                    \begin{aligned}
+                       \Pr[\algo{PrivK}^{cpa}_{\AdvA,\Pi}(n)=1]\leq\frac{1}{2}+\frac{q(n)}{2^n}+negl(n)
+                    \end{aligned}
+                \end{equation}
+                又因为 $\frac{q(n)}{2^n}$ 同样可忽略，有：
+                \begin{equation}
+                    \begin{aligned}
+                       \Pr[\algo{PrivK}^{cpa}_{\AdvA,\Pi}(n)=1]\leq\frac{1}{2}+negl(n)
+                    \end{aligned}
+                \end{equation}
+                即方案 $\Pi=(Gen,Enc,Dec)$ 是 CPA 安全的。
+            \end{enumerate}
+        \end{solution}
+
+    \question (3.29题) What is the effect of a single bit flip in the ciphertext when using the CBC, OFB, and CTR modes of operation?
+
+        \begin{solution}
+            \begin{enumerate}
+                \item[*] \textbf{CBC 模式}：注意到 $m_i=F_k^{-1}(c_i)\oplus{c_{i-1}}$，若 $c_i$ 中的某一位出现错误，其对应的明文块 $m_i$ 将完全错误，且接下来的密文块解密后的明文块 $m_{i+1}$ 的一位（对应 $c_i$ 中出错的位）会发生错误。
+                \item[*] \textbf{OFB 模式}：注意到用于与密文依次异或的流仅取决于 $c_0$（$IV$），若 $c_0$ 中的某一位出现错误，全部密文解密后都将完全错误；若 $c_i$（$i>0$）中的某一位出现错误，仅 $c_i$ 对应的明文块 $m_i$ 的对应位会发生错误。
+                \item[*] \textbf{CTR 模式}：注意到用于与密文依次异或的流仅取决于 $c_0$（$IV$），若 $c_0$ 中的某一位出现错误，全部密文解密后都将完全错误；若 $c_i$（$i>0$）中的某一位出现错误，仅 $c_i$ 对应的明文块 $m_i$ 的对应位会发生错误。
+            \end{enumerate}
+        \end{solution}
+
+    \question (3.30题) What is the effect of a dropped ciphertext block (e.g., if the transmitted ciphertext $c_1,c_2,c_3\cdots$ is received as $c_1,c_3\cdots$) when using the CBC, OFB, and CTR modes of operation?
+
+        \begin{solution}
+            \begin{enumerate}
+                \item[*] \textbf{CBC 模式}：注意到 $m_i=F_k^{-1}(c_i)\oplus{c_{i-1}}$，所有位于丢失的密文块之前的密文块将正常解密；位于丢失的密文块之后的第一个密文块将错误解密；位于丢失的密文块之后的第二个及之后的密文块将正常解密。
+                \item[*] \textbf{OFB 模式}：注意到用于与密文依次异或的流仅取决于 $c_0$（$IV$），所有位于丢失的密文块之前的密文块将正常解密；所有位于丢失的密文块之后的密文块将错误解密。
+                \item[*] \textbf{CTR 模式}：注意到用于与密文依次异或的流仅取决于 $c_0$（$IV$），所有位于丢失的密文块之前的密文块将正常解密；所有位于丢失的密文块之后的密文块将错误解密。
+            \end{enumerate}
+        \end{solution}
+
+\end{questions}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

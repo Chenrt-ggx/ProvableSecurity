@@ -1,0 +1,166 @@
+%% HOW TO USE THIS TEMPLATE:
+%%
+%% Ensure that you replace "YOUR NAME HERE" with your own name, in the
+%% \studentname command below.  Also ensure that the "answers" option
+%% appears within the square brackets of the \documentclass command,
+%% otherwise latex will suppress your solutions when compiling.
+%%
+%% Type your solution to each problem part within
+%% the \begin{solution} \end{solution} environment immediately
+%% following it.  Use any of the macros or notation from the
+%% header.tex that you need, or use your own (but try to stay
+%% consistent with the notation used in the problem).
+%%
+%% If you have problems compiling this file, you may lack the
+%% header.tex file (available on the course web page), or your system
+%% may lack some LaTeX packages.  The "exam" package (required) is
+%% available at:
+%%
+%% http://mirror.ctan.org/macros/latex/contrib/exam/exam.cls
+%%
+%% Other packages can be found at ctan.org, or you may just comment
+%% them out (only the exam and ams* packages are absolutely required).
+
+% the "answers" option causes the solutions to be printed
+% \documentclass[11pt,addpoints]{exam}
+
+%请使用xelatex编译
+\documentclass[11pt,addpoints,answers]{exam}
+
+% required macros -- get header.tex file from course web page
+\input{header}
+
+% VARIABLES
+
+\newcommand{\hwnum}{3}
+\newcommand{\studentname}{李田所-114514}
+
+% END OF SUPPLIED VARIABLES
+
+\hwheader                       % execute homework commands
+
+\begin{document}
+
+\pagestyle{head}                % put header on every page
+
+% QUESTIONS START HERE.  PROVIDE SOLUTIONS WITHIN THE "solution"
+% ENVIRONMENTS FOLLOWING EACH QUESTION.
+
+\begin{questions}
+    \question (3.9题) Consider a notion of indistinguishable encryption for multiple $distinct$ messages, i.e., where a scheme need not hide whether the same message is encrypted twice.
+
+        \begin{enumerate}
+            \item Modify Definition 3.18 to obtain a suitable definition of the above.
+            \item Show that Construction 3.17 does not satisfy your definition.
+            \item Give a construction of a $deterministic$ (stateless) encryption scheme that satisfies your definition.
+        \end{enumerate}
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+    \question (3.11题) Let $F$ be a length-preseving pseudorandom function. For the following constructions of a keyed function $F':\{0,1\}^n\times\{0,1\}^{n-1}\rightarrow\{0,1\}^{2n}$, state whether $F'$ is a pseudorandom function. If yes, prove it; if not, show an attack.
+
+        \begin{enumerate}
+            \item $F_k'\overset{def}=F_k(0\parallel{x})\parallel{F_k}(0\parallel{x})$.
+            \item $F_k'\overset{def}=F_k(0\parallel{x})\parallel{F_k}(1\parallel{x})$.
+            \item $F_k'\overset{def}=F_k(0\parallel{x})\parallel{F_k}(x\parallel{0})$.
+            \item $F_k'\overset{def}=F_k(0\parallel{x})\parallel{F_k}(x\parallel{1})$.
+        \end{enumerate}
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+    \question (3.13题) Let $F$ be a keyed function and consider the following experiment:
+
+        \indent The PRF indistinguishability experiment $PRF_{\AdvA,F}(n)$:
+
+        \begin{enumerate}
+            \item $A$ uniform bit $b\in\{0,1\}$ is chosen. If $b=1$ then choose uniform $k\in\{0,1\}^n$.
+            \item $\AdvA$ is given $1^n$ for input. If $b=0$ then $\AdvA$ is given access to a uniform function $f\in\algo{Func}_n$. If $b=1$ then $\AdvA$ is instead given access to $F_k(\cdot)$.
+            \item $\AdvA$ outputs a bit $b'$.
+            \item The output of the experiment is defined to be $1$ if $b'=b$, and $0$ otherwise.
+        \end{enumerate}
+
+        Define pseudorandom functions using this experiment, and prove that your definition is equivalent to Definition 3.24.
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+    \question (3.16题) Prove that if $F$ is a length-preserving pseudorandom function, then $G(s)\overset{def}{=}F_s(\left\langle1\right\rangle)\parallel{F_s}(\left\langle2\right\rangle)\parallel\cdots\parallel{F_s}(\left\langle\ell\right\rangle)$, where $\left\langle{i}\right\rangle$ is the $n$-bit encoding of $i$, is a pseudorandom generator with expansion factor $\ell\cdot{n}$.
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+    \question (3.19题) Let $F$ be a pseudorandom permutation, and define a fixed-length ecryption scheme $(\textsf{Enc},\textsf{Dec})$ as follows: On input a key $k\in\{0,1\}^n$ and message $m\in\{0,1\}^{n/2}$, algorithm $\textsf{Enc}$ chooses a uniform string $r\in\{0,1\}^{n/2}$ and computes $c:=F_k(r\parallel{m})$.
+
+        Show how to decrypt, and prove that this scheme is CPA-secure for messages of length $n/2$.
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+    \question(3.20题) Let $F$ be a length preserving pseudorandom function and $G$ be a pseudorandom generator with expansion factor $\ell(n)=n+1$. For each of the following encryption schemes, state whether the scheme has indistinguishable encryptions in the presence of an eavesdropper and whether it is CPA-secure.(In each case, the shared key is a uniform $k\in\{0,1\}^n$.) Explain your answer.
+
+        \begin{enumerate}
+            \item To encrypt $m\in\{0,1\}^{n+1}$, choose uniform $r\in\{0,1\}^n$ and output the ciphertext $\langle{r,G(r)\oplus{m}}\rangle$.
+            \item To encrypt $m\in\{0,1\}^n$, output the ciphertext $m\oplus{F_k}(0^n)$.
+            \item To encrypt $m\in\{0,1\}^{2n}$, parse $m$ as $\scriptstyle{m_1}\parallel{m_2}$ with $|m_1|=|m_2|$, then choose uniform $r\in\{0,1\}^n$ and send $\langle{r,m_1\oplus{F_k(r)},m_2\oplus{F_k(r+1)}}\rangle$.
+        \end{enumerate}
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+    \question (3.25题) Let $F$ be a pseudorandom permutation. Consider the mode of operation in which a uniform value $IV\in\{0,1\}^n$ is chosen, and the $i$th ciphertext block $c_i$ is computed as $c_i:=F_k(IV+i+m_i)$, where addition is modulo $2^n$. Show that this scheme is not EAV-secure.
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+    \question ([选做]3.28题) For any function $g:\{0,1\}^n\leftarrow\{0,1\}^n$, define $g^\text{\$}(\cdot)$ to be a $probabilistic$ oracle that, on input $1^n$, chooses uniform $r\in\{0,1\}^n$ and returns $\left\langle{r,g(r)}\right\rangle$. A keyed function $F$ is a $weak\ pseudorandom\ function$ if for all PPT algorithms $D$, there exists a negligible function $\textsf{negl}$ such that:
+
+        \begin{center}
+            $\left|\operatorname{Pr}\left[D^{F_{k}^{\$}(\cdot)}\left(1^{n}\right)=1\right]-\operatorname{Pr}\left[D^{f^{\$}(\cdot)}\left(1^{n}\right)=1\right]\right|\leq\operatorname{negl}(n)$
+        \end{center}
+
+        where $k\in\{0,1\}^n$ and $f\in\textsf{Func}_n$ are chosen uniformly.
+
+        \begin{enumerate}
+            \item Prove that $F$ is pseudorandom then it is weakly pseudorandom.
+            \item Let $F'$ be a pseudorandom function, and define:
+                \begin{center}
+                    $F_{k}(x)\stackrel{\text{def}}{=}\left\{\begin{array}{cl}F_{k}^{\prime}(x)&\text{if}x\text{is even}\\F_{k}^{\prime}(x+1)&\text{if}x\text{is odd}\end{array}\right.$
+                \end{center}
+                Prove that $F$ is weakly pseudorandom, but $not$ pseudorandom.
+            \item Is CTR-mode encryption using a weak pseudorandom function necessarily CPA-secure? Prove your answer.
+            \item Prove that Construction 3.28 is CPA-secure if $F$ is a weak pseudorandom function.
+        \end{enumerate}
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+    \question (3.29题) What is the effect of a single bit flip in the ciphertext when using the CBC, OFB, and CTR modes of operation?
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+    \question (3.30题) What is the effect of a dropped ciphertext block (e.g., if the transmitted ciphertext $c_1,c_2,c_3\cdots$ is received as $c_1,c_3\cdots$) when using the CBC, OFB, and CTR modes of operation?
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+\end{questions}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
