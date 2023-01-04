@@ -1,0 +1,278 @@
+%% HOW TO USE THIS TEMPLATE:
+%%
+%% Ensure that you replace "YOUR NAME HERE" with your own name, in the
+%% \studentname command below.  Also ensure that the "answers" option
+%% appears within the square brackets of the \documentclass command,
+%% otherwise latex will suppress your solutions when compiling.
+%%
+%% Type your solution to each problem part within
+%% the \begin{solution} \end{solution} environment immediately
+%% following it.  Use any of the macros or notation from the
+%% header.tex that you need, or use your own (but try to stay
+%% consistent with the notation used in the problem).
+%%
+%% If you have problems compiling this file, you may lack the
+%% header.tex file (available on the course web page), or your system
+%% may lack some LaTeX packages.  The "exam" package (required) is
+%% available at:
+%%
+%% http://mirror.ctan.org/macros/latex/contrib/exam/exam.cls
+%%
+%% Other packages can be found at ctan.org, or you may just comment
+%% them out (only the exam and ams* packages are absolutely required).
+
+% the "answers" option causes the solutions to be printed
+% \documentclass[11pt,addpoints]{exam}
+
+%请使用xelatex编译
+\documentclass[11pt,addpoints,answers]{exam}
+
+% required macros -- get header.tex file from course web page
+\input{header}
+
+% VARIABLES
+
+\newcommand{\hwnum}{5}
+\newcommand{\studentname}{李田所-114514}
+
+% END OF SUPPLIED VARIABLES
+
+\hwheader                       % execute homework commands
+
+\begin{document}
+
+\pagestyle{head}                % put header on every page
+
+% QUESTIONS START HERE.  PROVIDE SOLUTIONS WITHIN THE "solution"
+% ENVIRONMENTS FOLLOWING EACH QUESTION.
+
+\begin{questions}
+    \question (12.2题) Show that for any CPA-secure public-key encryption scheme for single bit messages, the length of the ciphertext must be superlogarithmic in the security parameter.
+
+        \begin{center}
+            $\algo{Hint:}$ If not, the range of possible ciphertexts has polynomial size.
+        \end{center}
+
+        \begin{solution}
+            \newline
+            假设密文长度是安全参数的对数量级，对给定的公钥 $pk$ 和比特 $m$，可能的密文数量为安全参数的多项式量级，记可能的密文集合为 $C_{pk}(m)$，其大小至多为安全参数 $n$ 的多项式 $f(n)$。攻击者可采用以下策略：
+            \begin{enumerate}
+                \item[*] 对于输入 $pk$，输出明文 $m_0=0$ 和 $m_1=1$，得到密文 $c$。
+                \item[*] 若 $c=c_0=\skcenc_{pk}(0)$，输出 $0$，若 $c=c_1=\skcenc_{pk}(1)$，输出 $1$，否则随机输出 $0$ 或 $1$。
+            \end{enumerate}
+            注意到存在 $c'\in{C}_{pk}(m)$ 满足 $\Pr[\skcenc_{pk}(m)=c']\geq\frac{1}{f(n)}$，可知：
+            \begin{equation}
+                \begin{aligned}
+                    \Pr[\algo{PubK}^{eav}_{\Adv,\Pi}=1]=&\frac{1}{2}\Pr[b'=0|b=0]+\frac{1}{2}\Pr[b'=1|b=1]\\
+                    =&\frac{1}{2}(\Pr[c=c_0]+\frac{1}{2}\Pr[c\neq{c}_0])+\frac{1}{2}(\Pr[c=c_1]+\frac{1}{2}\Pr[c\neq{c}_1])\\
+                    =&\frac{1}{2}(\frac{1}{2}+\frac{1}{2}\Pr[c=c_0])+\frac{1}{2}(\frac{1}{2}+\frac{1}{2}\Pr[c=c_1])\\
+                    =&\frac{1}{2}+\frac{1}{4}(\Pr[c=c_0]+\Pr[c=c_1])\\
+                    \geq&\frac{1}{2}+\frac{1}{4}(\Pr[c=c'\wedge{c}_0=c']+\Pr[c=c'\wedge{c}_1=c'])\\
+                    \geq&\frac{1}{2}+\frac{1}{4}(\frac{1}{f(n)^2}+\frac{1}{f(n)^2})=\frac{1}{2}+\frac{1}{2f(n)^2}
+                \end{aligned}
+            \end{equation}
+            由于 $f(n)$ 为安全参数 $n$ 的多项式，$\frac{1}{2f(n)^2}$ 不可忽略，因而假设不成立，密文长度是安全参数的对数量级时，方案不具有 CPA 安全，密文长度应为安全参数的超对数量级。
+        \end{solution}
+
+    \question (12.3题) Say a public-key encryption scheme $(\skcgen,\skcenc,\skcdec)$ is $one$-$way$ if any $\algo{PPT}$ adversary $\AdvA$ has negligible probability of success in the following experiment:
+
+        \begin{enumerate}
+            \item[$\bullet$] $\skcgen\left(1^{n}\right)$ is run to obtain keys $(pk,sk)$.
+            \item[$\bullet$] A uniform message $m$ in the message space is chosen, and a ciphertext $c\leftarrow\skcenc_{pk}(m)$ is computed.
+            \item[$\bullet$] $\AdvA$ is given $pk$ and $c$, and outputs a message $m^{'}$. We say $\AdvA$ succeeds if $m^{'}=m$.
+        \end{enumerate}
+
+        \begin{enumerate}
+            \item[(a)] Construct a CPA-secure KEM in the random-oracle model based on a one-way public-key encryption scheme with message space $\{0,1\}^n$.
+            \item[(b)] Can a $deterministic$ public-key encryption scheme be one-way? If not, prove impossibility; if so, give a construction based on any of the assumptions introduced in this book.
+        \end{enumerate}
+
+        \begin{solution}
+            \begin{enumerate}
+                \item[(a)] 设 $\Pi=(\skcgen,\skcenc,\skcdec)$ 为一个单向的公钥加密方案，可构造如下 KEM：
+                    \begin{enumerate}
+                        \item[*] $\skcgen$：对输入 $1^n$，运行 $\skcgen$ 以获得公私钥 $(pk,sk)$，选定 $H: \set{0,1}^*\rightarrow\set{0,1}^{l(n)}$。
+                        \item[*] $\hibeenc$：对输入的公钥 $pk$，选择 $r\in\set{0,1}^n$，输出密文 $\skcenc_{pk}(r)$ 和密钥 $H(r)$。
+                        \item[*] $\hibedec$：对输入的私钥 $sk$ 和密文 $c$，输出密钥 $H(\skcdec_{sk}(c))$。
+                    \end{enumerate}
+                    下面说明上述构造满足 CPA 安全，设 Query 为 $\AdvA$ 向随机 Oracle 查询 $r$ 的情况，则：
+                    \begin{equation}
+                        \begin{aligned}
+                            \Pr[\algo{KEM}^{cpa}_{\Adv,\Pi}=1]=&\Pr[\algo{KEM}^{cpa}_{\Adv,\Pi}=1\wedge\overline{Query}]+\Pr[\algo{KEM}^{cpa}_{\Adv,\Pi}=1\wedge{Query}]\\
+                            \leq&\Pr[\algo{KEM}^{cpa}_{\Adv,\Pi}=1\wedge\overline{Query}]+\Pr[Query]
+                        \end{aligned}
+                    \end{equation}
+                    若 $\Pr[\overline{Query}]=0$，则 $\Pr[\algo{KEM}^{cpa}_{\Adv,\Pi}=1\wedge\overline{Query}]=0$，否则有：
+                    \begin{equation}
+                        \begin{aligned}
+                            \Pr[\algo{KEM}^{cpa}_{\Adv,\Pi}=1\wedge\overline{Query}]=&\Pr[\algo{KEM}^{cpa}_{\Adv,\Pi}=1|\overline{Query}]\cdot\Pr[\overline{Query}]\\
+                            \leq&\Pr[\algo{KEM}^{cpa}_{\Adv,\Pi}=1|\overline{Query}]
+                        \end{aligned}
+                    \end{equation}
+                    注意到在实验 $\algo{KEM}^{cpa}_{\Adv,\Pi}$ 中，$\AdvA$ 的输入为公钥 $pk$、密文 $\skcenc_{pk}(r)$ 和 $k=H(r)$ 或随机选择的 $k\in\set{0,1}^{l(n)}$，在不进行 Query 的情况下，由于 $H$ 为随机 Oracle，对攻击者而言 $k$ 是均匀分布的，攻击者无法根据 $k$ 进行区分；又因为密文 $\skcenc_{pk}(r)$ 采用单向的加密方案得到，其被攻破的概率可忽略，因而有：
+                    \begin{equation}
+                        \begin{aligned}
+                            \Pr[\algo{KEM}^{cpa}_{\Adv,\Pi}=1|\overline{Query}]&\leq\frac{1}{2}+negl(n)\\
+                            \Pr[\algo{KEM}^{cpa}_{\Adv,\Pi}=1]&\leq\frac{1}{2}+negl(n)+\Pr[Query]
+                        \end{aligned}
+                    \end{equation}
+                    注意到 $\AdvA$ 为概率多项式时间的算法，其进行 Query 的次数存在多项式上限 $t(n)$，可基于针对 KEM 的攻击者 $\AdvA'$ 构造针对单向加密方案的攻击者 $\AdvA$：
+                    \begin{enumerate}
+                        \item[*] 对输入的公钥 $pk$ 和密钥 $c$，随机选择 $k\in\set{0,1}^{l(n)}$，随机选择 $b\in\set{0,1}$，$b=0$ 则设置 $\hat{k}=k$，否则随机选择 $\hat{k}\in\set{0,1}^{l(n)}$，使用 $pk,c,\hat{k}$ 启动算法 $\AdvA'$。
+                        \item[*] 当 $\AdvA'$ 询问 $\widetilde{r}$ 时，如果 $\widetilde{r}$ 被询问过则返回上一次被询问时的返回值，如果 $\skcenc_{pk}(\widetilde{r})=c$ 则返回 $k$，否则随机选择 $k'\in\set{0,1}^{l(n)}$ 并返回。
+                        \item[*] 当 $\AdvA'$ 运行结束时，从被询问过的 $\widetilde{r}$ 中随机返回一个结果。
+                    \end{enumerate}
+                    显然 $\AdvA$ 是概率多项式时间的算法，由于单向加密方案是安全的，其被攻破的概率可忽略且至少为 $\Pr[Query]/t(n)$，因而 $\Pr[Query]$ 可忽略，从而 $\Pr[\algo{KEM}^{cpa}_{\Adv,\Pi}=1]\leq\frac{1}{2}+negl(n)$，构造的 KEM 是 CPA 安全的。
+                \item[(b)] 朴素的 RSA 加密算法即为一个满足确定性和单向性的构造，其确定性显然，下面假设其不具有单向性而存在概率多项式时间的攻击者 $\AdvA'$，则可构造基于 $\AdvA'$ 的，可解决 RSA 问题的方案 $\AdvA$：
+                    \begin{enumerate}
+                        \item[*] 对输入的 $(N,e,y)$，使用 $(N,e)$（即 $pk$）启动 $\AdvA'$。
+                        \item[*] 对 $\AdvA'$ 输入 $y$，将 $\AdvA'$ 的输出 $m'$ 作为 $\AdvA$ 的输出。
+                    \end{enumerate}
+                由于 $\AdvA'$ 有不可忽略的概率攻击成功，攻击成功时 $m=m'=y^d\mod{N}$，因而 $m'^e\mod{N}=(y^d)^e\mod{N}=y^{de}\mod{N}=y\mod{N}$，$\AdvA$ 亦有不可忽略的概率攻击成功，这与 RSA 假设矛盾，故在 RSA 问题是困难问题的情况下，上述构造是单向的。
+            \end{enumerate}
+        \end{solution}
+
+    \question (12.5题) Show that Claim 12.7 does not hold in the setting of CCA-security.
+
+        \begin{solution}
+            \newline
+            攻击者可采取如下策略：
+            \begin{enumerate}
+                \item[*] 对于输入 $pk$，输出明文 $m_0=00$ 和 $m_1=11$，得到密文 $c=c_1\parallel{c}_2$。
+                \item[*] 计算 $c_2'=\skcenc_{pk}(0)$，向解密 Oracle 查询 $c'=c_1\parallel{c}_2'$。
+                \item[*] 记得到的明文 $m'=b\parallel0$，直接输出 $b$。
+            \end{enumerate}
+            显然，$m_0$ 和 $m_1$ 等长且 $c=c'=c_1\parallel{c}_2'$ 即 $c_2=\skcenc_{pk}(0)$ 的概率可忽略，因而攻击者有不可忽略的概率攻击成功，声明 12.7 中给出的方案 $\Pi'$ 不满足 CCA 安全。
+        \end{solution}
+
+    \question (12.6题) Consider the following public-key encryption scheme. The public key is $(G,q,g,h)$ and the private key is $x$, generated exactly as in the ElGamal encryption scheme. In order to encrypt a bit $b$, the sender does the following:
+
+        \begin{enumerate}
+            \item[(a)] If $b=0$ then choose a uniform $y\in{Z_q}$ and compute $c_1:=g^y$ and $c_2:=h^y$. The ciphertext is $\langle{c_1,c_2}\rangle$.
+            \item[(b)] If $b=1$ then choose independent uniform $y,z\in{Z_q}$, compute $c_1:=g^y$ and $c_2:=g^z$, and set the ciphertext equal to $\langle{c_1,c_2}\rangle$.
+        \end{enumerate}
+
+        Show that it is possible to decrypt efficiently given knowledge of $x$. Prove that this encryption scheme is CPA-secure if the decisional Diffie–Hellman problem is hard relative to $\mathcal{G}$.
+
+        \begin{solution}
+            \begin{enumerate}
+                \item[*] 可通过如下方式解密：对于 $\langle{c_1,c_2}\rangle$，计算 $c_1^x=(g^y)^x=(g^x)^y=h^y$。若 $c_2=h^y=c_1^x$ 则输出 $1$，否则输出 $0$（对随机选择的 $z$，$c_2=g^z=h^y=c_1^x$ 的概率可忽略）。
+                \item[*] 假设存在可以攻破上述加密方案的攻击者 $\AdvA'$，可构造基于攻击者 $\AdvA'$ 的解决 DDH 问题的方案 $\AdvA$ 如下：
+                    \begin{enumerate}
+                        \item[*] 对输入的 $(G,q,g,h,c_1,c_2)$，使用 $(G,q,g,h)$ 启动 $\AdvA'$，假设 $\AdvA'$ 输出 $m_0=0$ 和 $m_1=1$（$m_0=1$ 和 $m_1=0$ 的情况同理）。
+                        \item[*] 对 $\AdvA'$ 输入 $\langle{c_1,c_2}\rangle$，将 $\AdvA'$ 的输出作为 $\AdvA$ 的输出。
+                    \end{enumerate}
+                对输入的 $(G,q,g,h,c_1,c_2)$，有 $h=g^x$ 和 $c_1=g^y$：
+                    \begin{enumerate}
+                        \item[*] 若 $c_2=g^z$（$z$ 为随机选择），则有：
+                            \begin{equation}
+                                \begin{aligned}
+                                    \Pr[D(G,q,g,g^x,g^y,g^z)]=\Pr[\algo{PubK}^{eav}_{\Adv,\Pi}=1|b=1]
+                                \end{aligned}
+                            \end{equation}
+                        \item[*] 若 $c_2=h^y=g^{xy}$，则有：
+                            \begin{equation}
+                                \begin{aligned}
+                                    \Pr[D(G,q,g,g^x,g^y,g^{xy})]=\Pr[\algo{PubK}^{eav}_{\Adv,\Pi}=0|b=0]
+                                \end{aligned}
+                            \end{equation}
+                    \end{enumerate}
+                由此可知：
+                    \begin{equation}
+                        \begin{aligned}
+                            |\Pr&[D(G,q,g,g^x,g^y,g^z)]-\Pr[D(G,q,g,g^x,g^y,g^{xy})]|\\
+                            &=|\Pr[\algo{PubK}^{eav}_{\Adv,\Pi}=1|b=1]-\Pr[\algo{PubK}^{eav}_{\Adv,\Pi}=0|b=0]|\\
+                            &=|\Pr[\algo{PubK}^{eav}_{\Adv,\Pi}=1|b=1]-1+\Pr[\algo{PubK}^{eav}_{\Adv,\Pi}=1|b=0]|\\
+                            &=|2\cdot\Pr[\algo{PubK}^{eav}_{\Adv,\Pi}=1]-1|=2\cdot|\Pr[\algo{PubK}^{eav}_{\Adv,\Pi}=1]-\frac{1}{2}|
+                        \end{aligned}
+                    \end{equation}
+                由于攻击者 $\AdvA'$ 可以攻破上述加密方案，$\Pr[\algo{PubK}^{eav}_{\Adv,\Pi}=1]>\frac{1}{2}+negl(n)$，则 $2\cdot|\Pr[\algo{PubK}^{eav}_{\Adv,\Pi}=1]-\frac{1}{2}|>negl(n)$。\\
+                因而 $|\Pr[D(G,q,g,g^x,g^y,g^z)]-\Pr[D(G,q,g,g^x,g^y,g^{xy})]|>negl(n)$，与 DDH 假设矛盾，故在 DDH 问题是困难问题的情况下，上述方案是 CPA 安全的。
+            \end{enumerate}
+        \end{solution}
+
+    \question (12.8题) Consider the following protocol for two parties $A$ and $B$ to flip a fair coin (more complicated versions of this might be used for Internet gambling):
+
+        \begin{enumerate}
+            \item A trusted party $T$ publishes her public key $pk$; then $A$ choose a uniform bit $b_A$, encrypts it using $pk$, and announces the ciphertext $c_A$ to $B$ and $T$.
+            \item Next, $B$ acts symmetrically and announces a ciphertext $c_B\neq{c_A}$; $T$ decrypts both $c_A$ and $c_B$, and the parties XOR the results to obtain the value of the coin.
+        \end{enumerate}
+
+        \begin{enumerate}
+            \item[(a)] Argue that even if A is dishonest (but B is honest), the final value of the coin is uniformly distributed.
+            \item[(b)] Assume the parties use El Gamal encryption (where the bit $b$ is encoded as the group element $g^b$ before being encrypted—note that efficient decrypt is still possible). Show how a dishonest $B$ can bias the coin to any value he likes.
+            \item[(c)] Suggest what type of encryption scheme would be appropriate to use here. Can you define an appropriate notion of security and prove that your suggestion achieves this definition?
+        \end{enumerate}
+
+        \begin{solution}
+            \begin{enumerate}
+                \item[(a)] 注意到 $A$ 向 $B$ 和 $T$ 广播 $c_A$ 先于 $B$ 选择不同于 $c_A$ 的 $c_B$，攻击者 $A$ 在产生 $c_A$ 时无法获知关于 $B$ 的额外信息。由于 $B$ 是诚实的，其输出是随机的，因而无论 $A$ 是否诚实，最后的结果都是随机的。
+                \item[(b)] 记 $c_A=c_1\parallel{c}_2$，$c_B=c_1'\parallel{c}_2'$ 攻击者 $B$ 可采用以下策略：
+                    \begin{enumerate}
+                        \item[*] 如果 $B$ 希望最终的结果为 $0$，可随机选择 $r$ 并输出 $c_1'=c_1\cdot{g}^r$ 和 $c_2'=c_2\cdot{h}^r$，此时可得：
+                            \begin{equation}
+                                \begin{aligned}
+                                    b_B=&c_2'\cdot({c_1'^x})^{-1}\\
+                                    =&c_2\cdot{h}^r\cdot(c_1\cdot{g}^r)^{-x}\\
+                                    =&b_A\cdot{h}^y\cdot{h}^r\cdot(g^y\cdot{g}^r)^{-x}\\
+                                    =&b_A\cdot{g}^{xy}\cdot{g}^{xr}\cdot{g}^{-xy}\cdot{g}^{-xr}=b_A
+                                \end{aligned}
+                            \end{equation}
+                        因而总有 $b_A\oplus{b}_B=b_A\oplus{b}_A=0$。
+                        \item[*] 如果 $B$ 希望最终的结果为 $1$，可随机选择 $r$ 并输出 $c_1'=c_1^{-1}\cdot{g}^r$ 和 $c_2'=c_2^{-1}\cdot{g}\cdot{h}^r$，此时可得：
+                            \begin{equation}
+                                \begin{aligned}
+                                    b_B=&c_2'\cdot({c_1'^x})^{-1}\\
+                                    =&c_2^{-1}\cdot{g}\cdot{h}^r\cdot(c_1^{-1}\cdot{g}^r)^{-x}\\
+                                    =&(b_A\cdot{h}^y)^{-1}\cdot{g}\cdot{h}^r\cdot((g^y)^{-1}\cdot{g}^r)^{-x}\\
+                                    =&b_A^{-1}\cdot{h}^{-y}\cdot{g}\cdot{h}^r\cdot(g^{-y}\cdot{g}^r)^{-x}\\
+                                    =&b_A^{-1}\cdot{g}^{-xy}\cdot{g}\cdot{g}^{xr}\cdot{g}^{xy}\cdot{g}^{-xr}\\
+                                    =&g\cdot{b}_A^{-1}
+                                \end{aligned}
+                            \end{equation}
+                        因而总有 $b_A\oplus{b}_B=b_A\oplus(1-b_A)=1$。
+                    \end{enumerate}
+                \item[(c)] 注意到上一问中不安全的原因在于 $B$ 可以基于 $c_A$ 不经过加密算法构造 $c_B$，为解决此问题，考虑采用 CCA 安全的加密方案。\\
+                先定义公平抛币方案如下：若一个抛币方案对于有概率多项式能力的攻击者，无论其处于 $A$ 的位置还是 $B$ 的位置，抛币结果为 $0$ 的几率 $p(n)$ 都不超过 $\frac{1}{2}+negl(n)$，则此方案为公平抛币方案。\\
+                假设存在可以攻破采用了 CCA 安全的加密方案 $\Pi$ 的抛币方案的攻击者 $\AdvA'$，注意到第一问中已经说明，攻击者处于 $A$ 的位置时无法有效的攻击，攻击者一定处于 $B$ 的位置。下面构造攻击者 $\AdvA$，其可以基于 $\AdvA'$ 攻破 $\Pi$，$\AdvA$ 可采用如下策略：
+                    \begin{enumerate}
+                        \item[*] 对于输入 $pk$，输出明文 $m_0=0$ 和 $m_1=1$，得到密文 $c$ 作为 $c_A$。
+                        \item[*] 对处于 $B$ 位置的攻击者 $\AdvA'$ 输入密文 $c_A$，得到其输出 $c_B$（不同于 $c_A$）。
+                        \item[*] 向解密 Oracle 查询 $c_B$ 得到 $b_B$，若 $b_B=1$ 则输出 $1$，否则输出 $0$。
+                    \end{enumerate}
+                此时可得：
+                    \begin{equation}
+                        \begin{aligned}
+                            \Pr[\algo{PubK}^{eav}_{\Adv,\Pi}=1]=&\frac{1}{2}\Pr[b'=0|b=0]+\frac{1}{2}\Pr[b'=1|b=1]\\
+                            =&\frac{1}{2}\Pr[\text{抛币结果为} 0|b=0]+\frac{1}{2}\Pr[\text{抛币结果为} 0|b=1]\\
+                            =&\Pr[\text{抛币结果为} 0]=p(n)
+                        \end{aligned}
+                    \end{equation}
+                由于 $p(n)$ 超过 $\frac{1}{2}+negl(n)$，这与 CCA 安全要求的 $\Pr[\algo{PubK}^{eav}_{\Adv,\Pi}=1]\leq\frac{1}{2}+negl(n)$ 矛盾，因而假设不成立，采用了 CCA 安全的加密方案的抛币方案是公平抛币方案。
+            \end{enumerate}
+        \end{solution}
+
+    \question (12.10题) In Section 12.4.4 we showed that El Gamal encryption is malleable, and specifically that given a ciphertext $\langle{c_1,c_2}\rangle$ that is the encryption of some unknown message $m$, it is possible to produce a ciphertext $\langle{c_1,c'_2}\rangle$ that is the encryption of $\alpha\cdot{m}$ (for known $\alpha$). A receiver who receives both these ciphertext might be suspicious since both ciphertext share the first component. Show that it is possible to generate $\langle{c'_1,c'_2}\rangle$, that is the encryption of $\alpha\cdot{m}$, with $c'_1\neq{c_1}$ and $c'_2\neq{c_2}$.
+
+        \begin{solution}
+            \newline
+            可构造 $\langle{c'_1,c'_2}\rangle=\langle{c_1\cdot{g}^r,c_2\cdot{h}^r\cdot\alpha}\rangle$，此时有 $c'_1\neq{c_1}$ 和 $c'_2\neq{c_2}$，且：
+            \begin{equation}
+                \begin{aligned}
+                    m'=&c_2'\cdot({c_1'^x})^{-1}\\
+                    =&c_2\cdot{h}^r\cdot\alpha\cdot(c_1\cdot{g}^r)^{-x}\\
+                    =&m\cdot{h}^y\cdot{h}^r\cdot\alpha\cdot(g^y\cdot{g}^r)^{-x}\\
+                    =&m\cdot{g}^{xy}\cdot{g}^{xr}\cdot\alpha\cdot{g}^{-xy}\cdot{g}^{-xr}\\
+                    =&m\cdot\alpha
+                \end{aligned}
+            \end{equation}
+        \end{solution}
+
+\end{questions}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

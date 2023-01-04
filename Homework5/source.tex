@@ -1,0 +1,126 @@
+%% HOW TO USE THIS TEMPLATE:
+%%
+%% Ensure that you replace "YOUR NAME HERE" with your own name, in the
+%% \studentname command below.  Also ensure that the "answers" option
+%% appears within the square brackets of the \documentclass command,
+%% otherwise latex will suppress your solutions when compiling.
+%%
+%% Type your solution to each problem part within
+%% the \begin{solution} \end{solution} environment immediately
+%% following it.  Use any of the macros or notation from the
+%% header.tex that you need, or use your own (but try to stay
+%% consistent with the notation used in the problem).
+%%
+%% If you have problems compiling this file, you may lack the
+%% header.tex file (available on the course web page), or your system
+%% may lack some LaTeX packages.  The "exam" package (required) is
+%% available at:
+%%
+%% http://mirror.ctan.org/macros/latex/contrib/exam/exam.cls
+%%
+%% Other packages can be found at ctan.org, or you may just comment
+%% them out (only the exam and ams* packages are absolutely required).
+
+% the "answers" option causes the solutions to be printed
+% \documentclass[11pt,addpoints]{exam}
+
+%请使用xelatex编译
+\documentclass[11pt,addpoints,answers]{exam}
+
+% required macros -- get header.tex file from course web page
+\input{header}
+
+% VARIABLES
+
+\newcommand{\hwnum}{5}
+\newcommand{\studentname}{李田所-114514}
+
+% END OF SUPPLIED VARIABLES
+
+\hwheader                       % execute homework commands
+
+\begin{document}
+
+\pagestyle{head}                % put header on every page
+
+% QUESTIONS START HERE.  PROVIDE SOLUTIONS WITHIN THE "solution"
+% ENVIRONMENTS FOLLOWING EACH QUESTION.
+
+\begin{questions}
+    \question (12.2题) Show that for any CPA-secure public-key encryption scheme for single bit messages, the length of the ciphertext must be superlogarithmic in the security parameter.
+
+        \begin{center}
+            $\algo{Hint:}$ If not, the range of possible ciphertexts has polynomial size.
+        \end{center}
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+    \question (12.3题) Say a public-key encryption scheme $(\skcgen,\skcenc,\skcdec)$ is $one$-$way$ if any $\algo{PPT}$ adversary $\AdvA$ has negligible probability of success in the following experiment:
+
+        \begin{enumerate}
+            \item[*] $\skcgen\left(1^{n}\right)$ is run to obtain keys $(pk,sk)$.
+            \item[*] A uniform message $m$ in the message space is chosen, and a ciphertext $c\leftarrow\skcenc_{pk}(m)$ is computed.
+            \item[*] $\AdvA$ is given $pk$ and $c$, and outputs a message $m^{'}$. We say $\AdvA$ succeeds if $m^{'}=m$.
+        \end{enumerate}
+
+        \begin{enumerate}
+            \item[(a)] Construct a CPA-secure KEM in the random-oracle model based on a one-way public-key encryption scheme with message space $\{0,1\}^n$.
+            \item[(b)] Can a $deterministic$ public-key encryption scheme be one-way? If not, prove impossibility; if so, give a construction based on any of the assumptions introduced in this book.
+        \end{enumerate}
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+    \question (12.5题) Show that Claim 12.7 does not hold in the setting of CCA-security.
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+    \question (12.6题) Consider the following public-key encryption scheme. The public key is $(G,q,g,h)$ and the private key is $x$, generated exactly as in the ElGamal encryption scheme. In order to encrypt a bit $b$, the sender does the following:
+
+        \begin{enumerate}
+            \item[(a)] If $b=0$ then choose a uniform $y\in{Z_q}$ and compute $c_1:=g^y$ and $c_2:=h^y$. The ciphertext is $\langle{c_1,c_2}\rangle$.
+            \item[(b)] If $b=1$ then choose independent uniform $y,z\in{Z_q}$, compute $c_1:=g^y$ and $c_2:=g^z$, and set the ciphertext equal to $\langle{c_1,c_2}\rangle$.
+        \end{enumerate}
+
+        Show that it is possible to decrypt efficiently given knowledge of $x$. Prove that this encryption scheme is CPA-secure if the decisional Diffie–Hellman problem is hard relative to $\mathcal{G}$.
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+    \question (12.8题) Consider the following protocol for two parties $A$ and $B$ to flip a fair coin (more complicated versions of this might be used for Internet gambling):
+
+        \begin{enumerate}
+            \item A trusted party $T$ publishes her public key $pk$; then $A$ choose a uniform bit $b_A$, encrypts it using $pk$, and announces the ciphertext $c_A$ to $B$ and $T$.
+            \item Next, $B$ acts symmetrically and announces a ciphertext $c_B\neq{c_A}$; $T$ decrypts both $c_A$ and $c_B$, and the parties XOR the results to obtain the value of the coin.
+        \end{enumerate}
+
+        \begin{enumerate}
+            \item[(a)] Argue that even if A is dishonest (but B is honest), the final value of the coin is uniformly distributed.
+            \item[(b)] Assume the parties use El Gamal encryption (where the bit $b$ is encoded as the group element $g^b$ before being encrypted—note that efficient decrypt is still possible). Show how a dishonest $B$ can bias the coin to any value he likes.
+            \item[(c)] Suggest what type of encryption scheme would be appropriate to use here. Can you define an appropriate notion of security and prove that your suggestion achieves this definition?
+        \end{enumerate}
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+    \question (12.10题) In Section 12.4.4 we showed that El Gamal encryption is malleable, and specifically that given a ciphertext $\langle{c_1,c_2}\rangle$ that is the encryption of some unknown message $m$, it is possible to produce a ciphertext $\langle{c_1,c'_2}\rangle$ that is the encryption of $\alpha\cdot{m}$ (for known $\alpha$). A receiver who receives both these ciphertext might be suspicious since both ciphertext share the first component. Show that it is possible to generate $\langle{c'_1,c'_2}\rangle$, that is the encryption of $\alpha\cdot{m}$, with $c'_1\neq{c_1}$ and $c'_2\neq{c_2}$.
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+\end{questions}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
