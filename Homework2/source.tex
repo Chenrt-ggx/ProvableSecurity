@@ -1,0 +1,110 @@
+%% HOW TO USE THIS TEMPLATE:
+%%
+%% Ensure that you replace "YOUR NAME HERE" with your own name, in the
+%% \studentname command below.  Also ensure that the "answers" option
+%% appears within the square brackets of the \documentclass command,
+%% otherwise latex will suppress your solutions when compiling.
+%%
+%% Type your solution to each problem part within
+%% the \begin{solution} \end{solution} environment immediately
+%% following it.  Use any of the macros or notation from the
+%% header.tex that you need, or use your own (but try to stay
+%% consistent with the notation used in the problem).
+%%
+%% If you have problems compiling this file, you may lack the
+%% header.tex file (available on the course web page), or your system
+%% may lack some LaTeX packages.  The "exam" package (required) is
+%% available at:
+%%
+%% http://mirror.ctan.org/macros/latex/contrib/exam/exam.cls
+%%
+%% Other packages can be found at ctan.org, or you may just comment
+%% them out (only the exam and ams* packages are absolutely required).
+
+% the "answers" option causes the solutions to be printed
+% \documentclass[11pt,addpoints]{exam}
+
+%请使用xelatex编译
+\documentclass[11pt,addpoints,answers]{exam}
+
+% required macros -- get header.tex file from course web page
+\input{header}
+
+% VARIABLES
+
+\newcommand{\hwnum}{2}
+\newcommand{\studentname}{李田所-114514}
+
+% END OF SUPPLIED VARIABLES
+
+\hwheader                       % execute homework commands
+
+\begin{document}
+
+\pagestyle{head}                % put header on every page
+
+% QUESTIONS START HERE.  PROVIDE SOLUTIONS WITHIN THE "solution"
+% ENVIRONMENTS FOLLOWING EACH QUESTION.
+
+\begin{questions}
+    \question (3.2题) Prove that Definition 3.8 cannot be satisfied if $\Pi$ can encrypt arbitrary-length messages and the adversary is not restricted to output equal-length messages in experiment $\algo{PrivK}^{\textbf{eav}}_{\AdvA,\Pi}$.
+
+        \textbf{Hint:} Let $q(n)$ be a ploynomial upper-bound on the length of the ciphertext when $\Pi$ is used to encrypt a single bit. Then consider an adversary who outputs $m_0\in\{0,1\}$ and a uniform $m_1\in\{0,1\}^{q(n)+2}$.
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+    \question (3.3题) Say $\Pi=(\skcgen,\skcenc,\skcdec)$ is such that for $k\in\{0,1\}^n$, algorithm $\skcenc_k$ is only defined for messages of length at most $\ell(n)$ (for some polynomial $\ell$). Construct a scheme satisfying Definition 3.8 even when the adversary is $not$ restricted to outputing equal-length message in $\algo{PrivK}^{\textbf{eav}}_{\AdvA,\Pi}$.
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+    \question (3.4题) Prove the equivalence of Definition 3.8 and Definition 3.9.
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+    \question (3.6题) Let $G$ be a pseudorandom generator with expansion factor $\ell(n)>2n$. In each of the following cases, say whether $G'$ is necessarily a pseudorandom generator. If yes, give a proof; if not, show a counterexample.
+
+        \begin{enumerate}
+            \item Define $G'(s)\overset{def}{=}G(\overline{s})$, where $\overline{s}$ is the complement of $s$.
+            \item Define $G'(s)\overset{def}{=}\overline{G(s)}$.
+            \item Define $G'(s)\overset{def}{=}G(0^{|s|}\parallel{s})$.
+            \item Define $G'(s)\overset{def}{=}G(s)\parallel{G(s+1)}$.
+        \end{enumerate}
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+    \question (3.7题) Let $|G(s)|=\ell(|s|)$ for some $\ell$. Consider the following experiment:\\The PRG indistinguishability experiment $\algo{PRG}_{\AdvA,G}(n)$:
+
+        \begin{enumerate}
+            \item $A$ uniform bit $b\in\{0,1\}$ is chosen. If $b=0$ then choose a uniform $r\in\{0,1\}^{\ell(n)}$; if $b=1$ then choose a uniform $s\in\{0,1\}^n$ and set $r:=G(s)$.
+            \item The adversary $\AdvA$ is given r, and outputs a bit $b'$.
+            \item The output of the experiment is defined to be 1 if $b'=b$, and 0 otherwise.
+        \end{enumerate}
+
+        Provide a definition of a pseudorandom generator based on this experiment, and prove that your definition is equivalent to Definition 3.14. (That is, show that $G$ satisfies your definition if and only if it satisfies Definition 3.14.)
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+    \question (3.8题) Prove the converse of Theorem 3.16. Namely, show that if $G$ is not a pseudorandom generator then Construction 3.17 does not have indistinguishable encryptions in the presence of an eavesdropper.
+
+        \begin{solution}
+            %在此写入答案
+        \end{solution}
+
+\end{questions}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

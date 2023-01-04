@@ -1,0 +1,349 @@
+%% HOW TO USE THIS TEMPLATE:
+%%
+%% Ensure that you replace "YOUR NAME HERE" with your own name, in the
+%% \studentname command below.  Also ensure that the "answers" option
+%% appears within the square brackets of the \documentclass command,
+%% otherwise latex will suppress your solutions when compiling.
+%%
+%% Type your solution to each problem part within
+%% the \begin{solution} \end{solution} environment immediately
+%% following it.  Use any of the macros or notation from the
+%% header.tex that you need, or use your own (but try to stay
+%% consistent with the notation used in the problem).
+%%
+%% If you have problems compiling this file, you may lack the
+%% header.tex file (available on the course web page), or your system
+%% may lack some LaTeX packages.  The "exam" package (required) is
+%% available at:
+%%
+%% http://mirror.ctan.org/macros/latex/contrib/exam/exam.cls
+%%
+%% Other packages can be found at ctan.org, or you may just comment
+%% them out (only the exam and ams* packages are absolutely required).
+
+% the "answers" option causes the solutions to be printed
+% \documentclass[11pt,addpoints]{exam}
+
+%请使用xelatex编译
+\documentclass[11pt,addpoints,answers]{exam}
+
+% required macros -- get header.tex file from course web page
+\input{header}
+
+% VARIABLES
+
+\newcommand{\hwnum}{2}
+\newcommand{\studentname}{李田所-114514}
+
+\usepackage[ruled]{algorithm2e}
+
+\SetKwProg{Function}{function}{:}{end}
+
+\newcommand{\celda}[1]{
+    \begin{minipage}{2.5cm}
+        \vspace{5mm}
+        #1
+        \vspace{5mm}
+    \end{minipage}
+}
+
+% END OF SUPPLIED VARIABLES
+
+\hwheader                       % execute homework commands
+
+\begin{document}
+
+\pagestyle{head}                % put header on every page
+
+% QUESTIONS START HERE.  PROVIDE SOLUTIONS WITHIN THE "solution"
+% ENVIRONMENTS FOLLOWING EACH QUESTION.
+
+\begin{questions}
+    \question (3.2题) Prove that Definition 3.8 cannot be satisfied if $\Pi$ can encrypt arbitrary-length messages and the adversary is not restricted to output equal-length messages in experiment $\algo{PrivK}^{\textbf{eav}}_{\AdvA,\Pi}$.
+
+        \textbf{Hint:} Let $q(n)$ be a ploynomial upper-bound on the length of the ciphertext when $\Pi$ is used to encrypt a single bit. Then consider an adversary who outputs $m_0\in\{0,1\}$ and a uniform $m_1\in\{0,1\}^{q(n)+2}$.
+
+        \begin{solution}
+            \newline
+            记$q(n)$为$\Pi$加密$1$比特明文得到的密文的长度的多项式上限，则攻击者$\AdvA$可构造$m_0\in\{0,1\}$和$m_1\in\{0,1\}^{q(n)+2}$，并采用如下策略：
+            \begin{enumerate}
+                \item[*] 输出${b}^{'}=0$：如果密文$c$满足$|c|\leq{q(n)}$
+                \item[*] 输出${b}^{'}=1$：如果密文$c$满足$|c|>q(n)$
+            \end{enumerate}
+            注意到长度不超过$q(n)$的密文个数为$\sum_{l=1}^{q(n)}2^l=2^{q(n)+1}-2$，因而对长度为$q(n)+2$的$2^{q(n)+2}$个明文加密，得到的密文不可能全部满足长度不超过$q(n)$，因而：
+            \begin{equation}
+                \begin{aligned}
+                    \Pr[\algo{PrivK}^{eav}_{\Adv,\Pi}(n)=1]=&\Pr[b=0\wedge{b}^{'}=0]+\Pr[b=1\wedge{b}^{'}=1]\\
+                    =&\frac{1}{2}\Pr[{b}^{'}=0|b=0]+\frac{1}{2}\Pr[{b}^{'}=1|b=1]\\
+                    =&\frac{1}{2}+\frac{1}{2}\cdot(1-\Pr[{b}^{'}=0|b=1])\\
+                    \geq&\frac{1}{2}+\frac{1}{2}\cdot(1-\frac{2^{q(n)+1}-2}{2^{q(n)+2}})\\
+                    =&\frac{1}{2}+\frac{1}{2}\cdot(\frac{1}{2}+\frac{1}{2^{q(n)+1}})\\
+                    >&\frac{1}{2}+negl(n)
+                \end{aligned}
+            \end{equation}
+            因而在不限制消息长度的情况下，定义 3.8 无法满足。
+        \end{solution}
+
+    \question (3.3题) Say $\Pi=(\skcgen,\skcenc,\skcdec)$ is such that for $k\in\{0,1\}^n$, algorithm $\skcenc_k$ is only defined for messages of length at most $\ell(n)$ (for some polynomial $\ell$). Construct a scheme satisfying Definition 3.8 even when the adversary is $not$ restricted to outputing equal-length message in $\algo{PrivK}^{\textbf{eav}}_{\AdvA,\Pi}$.
+
+        \begin{solution}
+            \newline
+            考虑将长度$\ell\leq\ell(n)$的明文比特填充至长度为$\ell(n)+1$后进行加密，具体方式$do\_transform$和$undo\_transform$如下文所述，则可通过$\Pi=(\skcgen,\skcenc,\skcdec)$构造如下保密方案$\Pi^{'}=(\skcgen,\skcenc^{'},\skcdec^{'})$：\\
+                \begin{equation}
+                    \begin{aligned}
+                        & \skcenc_k^{'}(m)=\skcenc_k(do\_transform(m, \ell(n)+1))\\
+                        & \skcdec_k^{'}(c)=undo\_transform(\skcdec_k(c))
+                    \end{aligned}
+                \end{equation}
+            $do\_transform(m,n)$和$undo\_transform(m)$如下：\\
+                \begin{algorithm}[H]
+                \caption{对明文$m$进行比特填充}
+                \KwIn{$m$为明文，$n$为需要填充到的位数，满足$|m|<n$}
+                \Function{$do\_transform(m,n)$}{
+                    $m\leftarrow{m}\parallel1$\;
+                    \While{$|m|<n$}{
+                        $m\leftarrow{m}\parallel0$\;
+                    }
+                    \textbf{$return\ m$}\;
+                }
+                \end{algorithm}
+                \begin{algorithm}[H]
+                \caption{从经过比特填充的明文$m$恢复原明文}
+                \KwIn{$m$为经过比特填充的明文}
+                \Function{$undo\_transform(m)$}{
+                    \While{$m\ ends\ with\ 0$}{
+                        $remove\ last\ bit\ of\ m$\;
+                    }
+                    $remove\ last\ bit\ of\ m$\;
+                    \textbf{$return\ m$}\;
+                }
+                \end{algorithm}
+            方案$\Pi^{'}$的正确性显然，又因为$do\_transform(m,n)$和$undo\_transform(m)$都是多项式复杂度的，因而$\skcenc^{'}$和$\skcdec^{'}$也是多项式复杂度的。
+        \end{solution}
+
+    \question (3.4题) Prove the equivalence of Definition 3.8 and Definition 3.9.
+
+        \begin{solution}
+            \newline
+            简记$\Pr[out_\Adv(\algo{PrivK}^{eav}_{\Adv,\Pi}(n,0))=1]$为$\Pr[{b}^{'}=1|b=0]$，$\Pr[out_\Adv(\algo{PrivK}^{eav}_{\Adv,\Pi}(n,1))=1]$为$\Pr[{b}^{'}=1|b=1]$，注意到：
+            \begin{equation}
+                \begin{aligned}
+                    \Pr[\algo{PrivK}^{eav}_{\Adv,\Pi}(n)=1]=&\Pr[b=0\wedge{b}^{'}=0]+\Pr[b=1\wedge{b}^{'}=1]\\
+                    =&\frac{1}{2}\Pr[{b}^{'}=0|b=0]+\frac{1}{2}\Pr[{b}^{'}=1|b=1]\\
+                    =&\frac{1}{2}\cdot(1-\Pr[{b}^{'}=1|b=0])+\frac{1}{2}\Pr[{b}^{'}=1|b=1]\\
+                    =&\frac{1}{2}+\frac{1}{2}\cdot(\Pr[{b}^{'}=1|b=1]-\Pr[{b}^{'}=1|b=0])
+                \end{aligned}
+            \end{equation}
+            从而可得如下等式：
+            \begin{equation}
+                \begin{aligned}
+                    \Pr[\algo{PrivK}^{eav}_{\Adv,\Pi}(n)=1]-\frac{1}{2}=\frac{1}{2}\cdot(\Pr[{b}^{'}=1|b=1]-\Pr[{b}^{'}=1|b=0])\\
+                    |\Pr[\algo{PrivK}^{eav}_{\Adv,\Pi}(n)=1]-\frac{1}{2}|=\frac{1}{2}\cdot|\Pr[{b}^{'}=1|b=0]-\Pr[{b}^{'}=1|b=1]|
+                \end{aligned}
+            \end{equation}
+            若定义 3.8 成立，则有：
+            \begin{equation}
+                \begin{aligned}
+                    |\Pr[\algo{PrivK}^{eav}_{\Adv,\Pi}(n)=1]-\frac{1}{2}|=\frac{1}{2}\cdot|\Pr[{b}^{'}=1|b=0]-\Pr[{b}^{'}=1|b=1]|\leq{negl}(n)
+                \end{aligned}
+            \end{equation}
+            从而可得：
+            \begin{equation}
+                \begin{aligned}
+                    |\Pr[out_\Adv(\algo{PrivK}^{eav}_{\Adv,\Pi}(n,0))=1]-\Pr[out_\Adv(\algo{PrivK}^{eav}_{\Adv,\Pi}(n,1))=1]|\leq{negl}(n)
+                \end{aligned}
+            \end{equation}
+            若定义 3.9 成立，则有：
+            \begin{equation}
+                \begin{aligned}
+                    |\Pr[\algo{PrivK}^{eav}_{\Adv,\Pi}(n)=1]-\frac{1}{2}|=\frac{1}{2}\cdot|\Pr[{b}^{'}=1|b=0]-\Pr[{b}^{'}=1|b=1]|\leq{negl}(n)
+                \end{aligned}
+            \end{equation}
+            从而可得：
+            \begin{equation}
+                \begin{aligned}
+                    \frac{1}{2}-negl(n)\leq\Pr[\algo{PrivK}^{eav}_{\Adv,\Pi}(n)=1]\leq\frac{1}{2}+negl(n)
+                \end{aligned}
+            \end{equation}
+        \end{solution}
+
+    \question (3.6题) Let $G$ be a pseudorandom generator with expansion factor $\ell(n)>2n$. In each of the following cases, say whether $G'$ is necessarily a pseudorandom generator. If yes, give a proof; if not, show a counterexample.
+
+        \begin{enumerate}
+            \item Define $G'(s)\overset{def}{=}G(\overline{s})$, where $\overline{s}$ is the complement of $s$.
+            \item Define $G'(s)\overset{def}{=}\overline{G(s)}$.
+            \item Define $G'(s)\overset{def}{=}G(0^{|s|}\parallel{s})$.
+            \item Define $G'(s)\overset{def}{=}G(s)\parallel{G(s+1)}$.
+        \end{enumerate}
+
+        \begin{solution}
+            \newline
+            \begin{large}
+                \textbf{问题 1}
+            \end{large}
+            \newline
+            $G'$是伪随机生成器，扩展性显然，下面证明其伪随机性：
+            \begin{equation}
+                \begin{aligned}
+                    |\Pr&\ _{s\leftarrow{\set{0,1}^n}}\ [D(G'(s))=1]-\Pr\ _{r\leftarrow{\set{0,1}^{l(n)}}}\ [D(r)=1]|\\
+                    &=|\Pr\ _{s\leftarrow{\set{0,1}^n}}\ [D(G(\overline{s}))=1]-\Pr\ _{r\leftarrow{\set{0,1}^{l(n)}}}\ [D(r)=1]|\\
+                    &=|\Pr\ _{s\leftarrow{\set{1,0}^n}}\ [D(G(s))=1]-\Pr\ _{r\leftarrow{\set{0,1}^{l(n)}}}\ [D(r)=1]|\\
+                    &=|\Pr\ _{s\leftarrow{\set{0,1}^n}}\ [D(G(s))=1]-\Pr\ _{r\leftarrow{\set{0,1}^{l(n)}}}\ [D(r)=1]|\leq{negl}(n)
+                \end{aligned}
+            \end{equation}
+            \newline
+            \begin{large}
+                \textbf{问题 2}
+            \end{large}
+            \newline
+            $G'$是伪随机生成器，扩展性显然，假设$G'$不具有伪随机性：
+            \begin{equation}
+                \begin{aligned}
+                    |\Pr&\ _{s\leftarrow{\set{0,1}^n}}\ [D(G'(s))=1]-\Pr\ _{r\leftarrow{\set{0,1}^{l(n)}}}\ [D(r)=1]|\\
+                    &=|\Pr\ _{s\leftarrow{\set{0,1}^n}}\ [D(\overline{G(s)})=1]-\Pr\ _{r\leftarrow{\set{0,1}^{l(n)}}}\ [D(r)=1]|\\
+                    &=|\Pr\ _{s\leftarrow{\set{0,1}^n}}\ [D(\overline{G(s)})=1]-\Pr\ _{r\leftarrow{\set{1,0}^{l(n)}}}\ [D(\overline{r})=1]|\\
+                    &=|\Pr\ _{s\leftarrow{\set{0,1}^n}}\ [D(\overline{G(s)})=1]-\Pr\ _{r\leftarrow{\set{0,1}^{l(n)}}}\ [D(\overline{r})=1]|>{negl}(n)
+                \end{aligned}
+            \end{equation}
+            可定义$D'$如下：
+            \begin{equation}
+                \begin{aligned}
+                    D'(s)=D(\overline{s})
+                \end{aligned}
+            \end{equation}
+            此时成立：
+            \begin{equation}
+                \begin{aligned}
+                    |\Pr&\ _{s\leftarrow{\set{0,1}^n}}\ [D(G(s))=1]-\Pr\ _{r\leftarrow{\set{0,1}^{l(n)}}}\ [D(r)=1]|\\
+                    &=|\Pr\ _{s\leftarrow{\set{0,1}^n}}\ [D'(G(s))=1]-\Pr\ _{r\leftarrow{\set{0,1}^{l(n)}}}\ [D'(r)=1]|>{negl}(n)
+                \end{aligned}
+            \end{equation}
+            上式表明$G$不具有伪随机性，与条件矛盾，因而假设不成立，$G'$具有伪随机性。
+            \newline
+            \begin{large}
+                \textbf{问题 3}
+            \end{large}
+            \newline
+            $G'$不是伪随机生成器，可构造$G(s)$：只使用$s$的前$|s|/2$位生成长$\ell(n)>2n$的伪随机序列，按照$G'(s)$的定义，在这种构造下$G'(s)$的结果是固定的，记为$m$。\\
+            下面证明这不满足伪随机性，考虑算法$D$：如果输入为$m$，输出$1$，否则输出$0$，可得：
+            \begin{equation}
+                \begin{aligned}
+                    |\Pr&\ _{s\leftarrow{\set{0,1}^n}}\ [D(G'(s))=1]-\Pr\ _{r\leftarrow{\set{0,1}^{l(n)}}}\ [D(r)=1]|=|1-\frac{1}{2^{\ell(n)}}|>negl(n)
+                \end{aligned}
+            \end{equation}
+            上式表明$G'$不具有伪随机性。
+            \newline
+            \begin{large}
+                \textbf{问题 4}
+            \end{large}
+            \newline
+            $G'$不是伪随机生成器，可构造$G(s)$：只使用$s$的前$|s|-1$位生成长$\ell(n)>2n$的伪随机序列，按照$G'(s)$的定义，在这种构造下$|G'(s)|$为偶数且当$s$为偶数时，$G'(s)$的结果前半部分和后半部分一定相同。\\
+            下面证明这不满足伪随机性，考虑算法$D$：如果输入的前半部分和后半部分相同，输出$1$，否则输出$0$，可得：
+            \begin{equation}
+                \begin{aligned}
+                    |\Pr\ _{s\leftarrow{\set{0,1}^n}}\ [D(G'(s))&=1]-\Pr\ _{r\leftarrow{\set{0,1}^{l(n)}}}\ [D(r)=1]|\\
+                    &>|\Pr\ _{s\leftarrow{\set{0,1}^n}}\ [s\ mod\ 2=0]-\Pr\ _{r\leftarrow{\set{0,1}^{l(n)}}}\ [D(r)=1]|\\
+                    &=|\frac{1}{2}-\frac{2^{\ell(n)/2}}{2^{\ell(n)}}|=|\frac{1}{2}-\frac{1}{2^{\ell(n)/2}}|>negl(n)
+                \end{aligned}
+            \end{equation}
+            上式表明$G'$不具有伪随机性。
+        \end{solution}
+
+    \question (3.7题) Let $|G(s)|=\ell(|s|)$ for some $\ell$. Consider the following experiment:\\The PRG indistinguishability experiment $\algo{PRG}_{\AdvA,G}(n)$:
+
+        \begin{enumerate}
+            \item $A$ uniform bit $b\in\{0,1\}$ is chosen. If $b=0$ then choose a uniform $r\in\{0,1\}^{\ell(n)}$; if $b=1$ then choose a uniform $s\in\{0,1\}^n$ and set $r:=G(s)$.
+            \item The adversary $\AdvA$ is given r, and outputs a bit ${b}^{'}$.
+            \item The output of the experiment is defined to be 1 if ${b}^{'}=b$, and 0 otherwise.
+        \end{enumerate}
+
+        Provide a definition of a pseudorandom generator based on this experiment, and prove that your definition is equivalent to Definition 3.14. (That is, show that $G$ satisfies your definition if and only if it satisfies Definition 3.14.)
+
+        \begin{solution}
+            \newline
+            伪随机生成器$G$可通过上述实验定义为，对于任意多项式时间的算法$\AdvA$，成立：
+            \begin{equation}
+                \begin{aligned}
+                    \Pr[\algo{PRG}_{\AdvA,G}(n)=1]\leq\frac{1}{2}+negl(n)
+                \end{aligned}
+            \end{equation}
+            简记$\Pr\ _{r\leftarrow{\set{0,1}^{l(n)}}}\ [D(r)=1]$为$\Pr[{b}^{'}=1|b=0]$，$\Pr\ _{s\leftarrow{\set{0,1}^n}}\ [D(G(s))=1]$为$\Pr[{b}^{'}=1|b=1]$，等价性证明如下：
+            \begin{equation}
+                \begin{aligned}
+                    \Pr[\algo{PRG}_{\AdvA,G}(n)=1]=&\Pr[b=0\wedge{b}^{'}=0]+\Pr[b=1\wedge{b}^{'}=1]\\
+                    =&\frac{1}{2}\Pr[{b}^{'}=0|b=0]+\frac{1}{2}\Pr[{b}^{'}=1|b=1]\\
+                    =&\frac{1}{2}\cdot(1-\Pr[{b}^{'}=1|b=0])+\frac{1}{2}\Pr[{b}^{'}=1|b=1]\\
+                    =&\frac{1}{2}+\frac{1}{2}\cdot(\Pr[{b}^{'}=1|b=1]-\Pr[{b}^{'}=1|b=0])
+                \end{aligned}
+            \end{equation}
+            从而可得如下等式：
+            \begin{equation}
+                \begin{aligned}
+                    \Pr[\algo{PRG}_{\AdvA,G}(n)=1]-\frac{1}{2}=\frac{1}{2}\cdot(\Pr[{b}^{'}=1|b=1]-\Pr[{b}^{'}=1|b=0])\\
+                    |\Pr[\algo{PRG}_{\AdvA,G}(n)=1]-\frac{1}{2}|=\frac{1}{2}\cdot|\Pr[{b}^{'}=1|b=1]-\Pr[{b}^{'}=1|b=0]|
+                \end{aligned}
+            \end{equation}
+            若上述定义成立，则有：
+            \begin{equation}
+                \begin{aligned}
+                    |\Pr[\algo{PRG}_{\AdvA,G}(n)=1]-\frac{1}{2}|=\frac{1}{2}\cdot|\Pr[{b}^{'}=1|b=1]-\Pr[{b}^{'}=1|b=0]|\leq{negl}(n)
+                \end{aligned}
+            \end{equation}
+            从而可得：
+            \begin{equation}
+                \begin{aligned}
+                    |\Pr\ _{s\leftarrow{\set{0,1}^n}}\ [D(G(s))=1]-\Pr\ _{r\leftarrow{\set{0,1}^{l(n)}}}\ [D(r)=1]|\leq{negl}(n)
+                \end{aligned}
+            \end{equation}
+            若定义 3.14 成立，则有：
+            \begin{equation}
+                \begin{aligned}
+                    |\Pr[\algo{PRG}_{\AdvA,G}(n)=1]-\frac{1}{2}|=\frac{1}{2}\cdot|\Pr[{b}^{'}=1|b=1]-\Pr[{b}^{'}=1|b=0]|\leq{negl}(n)
+                \end{aligned}
+            \end{equation}
+            从而可得：
+            \begin{equation}
+                \begin{aligned}
+                    \frac{1}{2}-negl(n)\leq\Pr[\algo{PRG}_{\AdvA,G}(n)=1]\leq\frac{1}{2}+negl(n)
+                \end{aligned}
+            \end{equation}
+        \end{solution}
+
+    \question (3.8题) Prove the converse of Theorem 3.16. Namely, show that if $G$ is not a pseudorandom generator then Construction 3.17 does not have indistinguishable encryptions in the presence of an eavesdropper.
+
+        \begin{solution}
+            \newline
+            由于$G$不是伪随机生成器，成立：
+            \begin{equation}
+                \begin{aligned}
+                    |\Pr\ _{s\leftarrow{\set{0,1}^n}}\ [D(G(s))=1]-\Pr\ _{r\leftarrow{\set{0,1}^{l(n)}}}\ [D(r)=1]|>{negl}(n)
+                \end{aligned}
+            \end{equation}
+            对于构造 3.17，选择$m_0=0^{\ell(n)}$，随机选择$m_1\in\set{0,1}^{\ell(n)}$，注意到若$b=0$，有$c=G(k)$，若$b=1$，有$c$在$\set{0,1}^{\ell(n)}$均匀分布，考虑攻击者$\AdvA$的策略为直接输出$D(c)$（显然是多项式时间的），熟知：
+            \begin{equation}
+                \begin{aligned}
+                    \Pr[\algo{PrivK}^{eav}_{\Adv,\Pi}=1]=&\Pr[b=0\wedge{b}^{'}=0]+\Pr[b=1\wedge{b}^{'}=1]\\
+                    =&\frac{1}{2}\Pr[{b}^{'}=0|b=0]+\frac{1}{2}\Pr[{b}^{'}=1|b=1]\\
+                    =&\frac{1}{2}\cdot(1-\Pr[{b}^{'}=1|b=0])+\frac{1}{2}\Pr[{b}^{'}=1|b=1]\\
+                    =&\frac{1}{2}+\frac{1}{2}\cdot(\Pr[{b}^{'}=1|b=1]-\Pr[{b}^{'}=1|b=0])
+                \end{aligned}
+            \end{equation}
+            由于上述构造中，$\Pr[{b}^{'}=1|b=0]$即$\Pr\ _{s\leftarrow{\set{0,1}^n}}\ [D(G(s))=1]$，$\Pr[{b}^{'}=1|b=1]$即$\Pr\ _{r\leftarrow{\set{0,1}^{l(n)}}}\ [D(r)=1]$，则有：
+            \begin{equation}
+                \begin{aligned}
+                    \Pr[\algo{PrivK}^{eav}_{\Adv,\Pi}=1]=&\frac{1}{2}+\frac{1}{2}\cdot(\Pr[{b}^{'}=1|b=1]-\Pr[{b}^{'}=1|b=0])\\
+                    =&\frac{1}{2}+\frac{1}{2}\cdot(\Pr\ _{r\leftarrow{\set{0,1}^{l(n)}}}\ [D(r)=1]-\Pr\ _{s\leftarrow{\set{0,1}^n}}\ [D(G(s))=1])\\
+                    >&\frac{1}{2}+negl(n)
+                \end{aligned}
+            \end{equation}
+            即构造 3.17 对于多项式时间的攻击者$\AdvA$不是不可区分的。
+        \end{solution}
+
+\end{questions}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
