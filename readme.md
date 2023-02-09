@@ -2,4 +2,4 @@
 
 ![license](https://img.shields.io/github/license/Chenrt-ggx/ProvableSecurity)
 
-BUAA 2039 Provable Security
+Homeworks in BUAA 2039 Provable Security.
